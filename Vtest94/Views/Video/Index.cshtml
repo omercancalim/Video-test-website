@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Vtest94.Models.Video>
+
+@{
+    ViewData["Title"] = "Uploaded Videos";
+}
+
+<link rel="stylesheet" href="~/css/video-page.css" />
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        @foreach (var video in Model)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm video-container">
+                    <div class="thumbnail-container">
+                        <img src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" class="card-img-top video-thumbnail" alt="Video Thumbnail">
+                        <button class="btn btn-play">
+                            <img src="~/auxiliary/play-button.png" alt="Play" style="width:100%;">
+                        </button>
+                    </div>
+                    <video controls>
+                        <source src="@Url.Content($"~/videos/{video.FileName}")" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-body">
+                        <h5 class="card-title">@video.Title</h5>
+                        <p class="card-text">@video.Description</p>
+                        <p class="card-text"><small class="text-muted">Uploaded on @video.UploadedDate.ToString("g")</small></p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No videos have been uploaded yet.</p>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.video-container').forEach(container => {
+            const playButton = container.querySelector('.btn-play');
+            const video = container.querySelector('video');
+            const thumbnail = container.querySelector('.video-thumbnail');
+
+            playButton.addEventListener('click', () => {
+                thumbnail.style.display = 'none';
+                playButton.style.display = 'none';
+                video.style.display = 'block';
+                video.play();
+            });
+        });
+    </script>
+}
