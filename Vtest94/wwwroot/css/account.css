@@ -1,0 +1,64 @@
+﻿body {
+    /* Darker gradient colors and 45-degree rotation */
+    background: linear-gradient(135deg, #660000, #0f005a, #330033);
+    background-attachment: fixed; /* Keeps the background fixed during scrolling */
+    color: #ffffff; /* Light text color for better readability against the dark background */
+}
+
+.login-form,
+.register-form {
+    border: 2px solid #5600a1; /* Specific border color */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Subtle shadow */
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.form-horizontal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column;
+    width:100%;
+}
+
+input[type="email"], input[type="password"], input[type="text"] {
+    width: 300px;
+    background-color: #1a237e; /* Lighter blue background */
+    color: #FFD700; /* White text color */
+    border-radius: 4px; /* Slightly rounded borders for the input fields */
+    caret-color: #FFD700;
+}
+
+/* Focus styles for inputs to maintain style consistency when typing */
+input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+    background-color: #0a005d; /* Darker blue background for focus */
+    color: #FFD700; /* Gold color text for focus */
+    border-color: #FFD700; /* Gold color border for focus */
+}
+
+/* Ensuring autofill maintains the style */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #FFD700 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1a237e inset;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    height:100vh;
+}
+
+.form-login-google {
+    background-color: #dc3545;
+    color: inherit;
+    border:
+}

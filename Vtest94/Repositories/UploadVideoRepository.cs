@@ -17,7 +17,7 @@ namespace Vtest94.Repositories
             _hostingEnvironment = hostingEnvironment;
             _videoProcessing = videoProcessing;
         }
-        public async Task<Video> AddVideoAsync(Video video, IFormFile videoFile, int thumbnailFrameTime)
+        public async Task<Video> AddVideoAsync(Video video, IFormFile videoFile, int thumbnailFrameTime, int categoryId)
         {
             if (videoFile != null && videoFile.Length > 0)
             {
@@ -36,6 +36,7 @@ namespace Vtest94.Repositories
 
                 video.ThumbnailName = thumbnailFileName;
 
+                video.CategoryId = categoryId;
                 // Assuming other properties like Title and Description are already set on the Video object
                 _context.Videos.Add(video);
                 await _context.SaveChangesAsync();

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Vtest94.Models;
 using Vtest94.ViewModels;
 
@@ -68,6 +71,63 @@ namespace Vtest94.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult LoginWithGoogle(string returnUrl = "/Video/Index")
+        {
+            var redirectUrl = Url.Action(nameof(GoogleLoginCallback), "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return Challenge(properties, "Google");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GoogleLoginCallback(string returnUrl = "/Video/Index")
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                // Consider logging this error
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Attempt to sign in the user with the external login info
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (signInResult.Succeeded)
+            {
+                return Redirect(returnUrl);
+            }
+
+            // If user is not in our system, create a new user account
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new User { UserName = email, Email = email };
+                var createUserResult = await _userManager.CreateAsync(user);
+                if (!createUserResult.Succeeded)
+                {
+                    // Consider logging this error and showing a friendly message to the user
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+
+            // Link the external login to the user account and sign in
+            var addLoginResult = await _userManager.AddLoginAsync(user, info);
+            if (!addLoginResult.Succeeded)
+            {
+                // Consider logging this error
+                return RedirectToAction(nameof(Login));
+            }
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return Redirect(returnUrl);
+        }
+
+
+        public IActionResult AccessDenied()
+        {
+            return RedirectToAction("Login", new { ReturnUrl = "/Video/Index" });
+        }
+
         // GET: /Account/Register
         public IActionResult Register()
         {
@@ -106,13 +166,65 @@ namespace Vtest94.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
+
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                // Handle the error scenario
+                return RedirectToAction(nameof(Login), new { ErrorMessage = "Error from external provider: " + remoteError });
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                // Handle the error scenario
+                return RedirectToAction(nameof(Login), new { ErrorMessage = "Error loading external login information." });
+            }
+
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (signInResult.Succeeded)
+            {
+                return LocalRedirect(returnUrl ?? "/");
+            }
+            else
+            {
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);  // Extracting first name
+                var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);    // Extracting last name
+
+                var user = new User { UserName = email, Email = email, FirstName = firstName, LastName = lastName };
+
+                var result = await _userManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    result = await _userManager.AddLoginAsync(user, info);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect(returnUrl ?? "/");
+                    }
+                }
+
+                return RedirectToAction(nameof(Login), new { ErrorMessage = "Failed to create the user account." });
+            }
+        }
+
+
         // POST: /Account/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Index", "Video");
         }
     }
 }

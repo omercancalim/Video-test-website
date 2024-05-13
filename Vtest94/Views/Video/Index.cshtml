@@ -4,9 +4,11 @@
     ViewData["Title"] = "Uploaded Videos";
 }
 
-<link rel="stylesheet" href="~/css/video-page.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/video-page.css" asp-append-version="true" />
+}
 
-<h2>@ViewData["Title"]</h2>
+<!-- <h2>@ViewData["Title"]</h2> -->
 
 @if (Model != null && Model.Any())
 {
@@ -14,21 +16,22 @@
         @foreach (var video in Model)
         {
             <div class="col-md-4">
-                <div class="card mb-4 shadow-sm video-container">
-                    <div class="thumbnail-container">
+                <div class="card mb-4 video-container">
+                    <div class="thumbnail-container position-relative">
                         <img src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" class="card-img-top video-thumbnail" alt="Video Thumbnail">
-                        <button class="btn btn-play">
-                            <img src="~/auxiliary/play-button.png" alt="Play" style="width:100%;">
+                        <!-- Adding a button to play the video, assuming JavaScript handles play functionality -->
+                        <button class="btn btn-play position-absolute top-50 start-50 translate-middle" onclick="playVideo(this)">
+                            <img src="~/auxiliary/play-button.png" alt="Play" style="width: 64px;"> <!-- Size adjusted for better UX -->
                         </button>
                     </div>
-                    <video controls>
+                    <video controls class="w-100" style="display:none; border-radius:6px;">
                         <source src="@Url.Content($"~/videos/{video.FileName}")" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <div class="card-body">
+                    <div class="custom-card-body text-white" style="border-bottom-left-radius:6px; border-bottom-right-radius:6px;">
                         <h5 class="card-title">@video.Title</h5>
                         <p class="card-text">@video.Description</p>
-                        <p class="card-text"><small class="text-muted">Uploaded on @video.UploadedDate.ToString("g")</small></p>
+                        <p class="card-text"><small class="text-light">Uploaded on @video.UploadedDate.ToString("g")</small></p>
                     </div>
                 </div>
             </div>

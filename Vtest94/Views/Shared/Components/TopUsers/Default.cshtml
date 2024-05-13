@@ -1,0 +1,23 @@
+﻿@model List<Vtest94.Models.User>
+
+<div class="custom-widget-inner">
+    <h5 class="custom-widget-title">Top Users</h5>
+    <div class="d-flex flex-column">
+        @foreach (var user in Model)
+        {
+            <div class="d-flex custom-widget-item">
+                <div class="custom-channel-picture">
+                    <!-- Assuming a placeholder image for the user; adjust as necessary -->
+                    <a asp-controller="User" asp-action="Profile" asp-route-userId="@user.Id" title="@user.UserName">
+                        <img class="channel-img" src="~/thumbnails/thumbnail_1034e494-3121-43c2-a06a-741f0db247ac.jpg" alt="@user.UserName">
+                    </a>
+                </div>
+                <div class="custom-channel-info">
+                    <a asp-controller="User" asp-action="Profile" asp-route-userId="@user.Id" class="channel-info-name text-truncate">@user.UserName</a>
+                    <p class="channel-info-videos">Videos: @user.Videos.Count</p>
+                    <p class="channel-info-views">28134 views</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

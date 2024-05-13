@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Vtest94.Data;
 using Vtest94.Interfaces;
 using Vtest94.Models;
 using Vtest94.ViewModels;
@@ -11,14 +14,16 @@ namespace Vtest94.Controllers
     {
         private readonly IUploadVideoRepository _videoRepository;
         private readonly UserManager<User> _userManager;
-        public VideoController(IUploadVideoRepository videoRepository, UserManager<User> userManager)
+        private readonly AppDbContext _appDbContext;
+        public VideoController(IUploadVideoRepository videoRepository, UserManager<User> userManager, AppDbContext appDbContext)
         {
             _videoRepository = videoRepository;
             _userManager = userManager;
+            _appDbContext = appDbContext;
         }
 
         [HttpGet] // Actually [HttpGet] is set by default we dont have to wirte it explicitly
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string searchString)
         {
             ViewData["CurrentFilter"] = searchString;
@@ -28,9 +33,14 @@ namespace Vtest94.Controllers
 
         // Display the form for uploading a new video
         [Authorize]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var categories = await _appDbContext.Categories.OrderBy(c => c.Name).ToListAsync();
+            var model = new CreateVideoViewModel
+            {
+                Categories = new SelectList(categories, "Id", "Name")  // Populate the SelectList for categories
+            };
+            return View(model);
         }
 
         // Process the form submission for a new video
@@ -59,7 +69,7 @@ namespace Vtest94.Controllers
             if (videoViewModel.VideoFile != null && videoViewModel.VideoFile.Length > 0)
             {
                 videoViewModel.Video.UserId = user.Id;  // Set the UserId to the logged user's Id
-                await _videoRepository.AddVideoAsync(videoViewModel.Video, videoViewModel.VideoFile, videoViewModel.ThumbnailFrameTime);
+                await _videoRepository.AddVideoAsync(videoViewModel.Video, videoViewModel.VideoFile, videoViewModel.ThumbnailFrameTime, videoViewModel.SelectedCategoryId.Value);
                 return RedirectToAction(nameof(Index));
             }
             else

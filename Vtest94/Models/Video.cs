@@ -27,5 +27,10 @@ namespace Vtest94.Models
 
         [ForeignKey("UserId")]  // This ensures EF Core understands the relationship
         public User? User { get; set; }
+
+        public int? CategoryId { get; set; }  // Foreign key
+
+        [ForeignKey("CategoryId")]
+        public Category? Category { get; set; }  // Navigation property
     }
 }

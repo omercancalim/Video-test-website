@@ -2,37 +2,36 @@
 
 @model LoginViewModel
 
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
 @{
+    ViewData["Title"] = "Login";
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Login" asp-controller="Account" method="post" class="needs-validation" novalidate>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <input asp-for="RememberMe" class="form-check-input" />
-                <label asp-for="RememberMe" class="form-check-label"></label>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Log in</button>
-            </div>
-            <p>
-                Don't have an account? <a asp-controller="Account" asp-action="Register">Register here</a>
-            </p>
-        </form>
-    </div>
+<div class="login-form">
+    <h2>Login</h2>
+    <form asp-action="Login" asp-controller="Account" method="post" class="form-horizontal">
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email address</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="mb-3 form-check">
+            <input asp-for="RememberMe" class="form-check-input" />
+            <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <hr />
+    <form asp-action="LoginWithGoogle" method="get" class="mt-2">
+        <button type="submit" value="Login with Google" class="btn btn-danger">
+            <i class="fab fa-google"></i> Login with Google
+        </button>
+    </form>
 </div>
+
+
