@@ -1,0 +1,47 @@
+﻿.custom-widget-item:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.custom-channel-picture {
+    max-width: 60px;
+    width: 60px;
+    min-width: 60px;
+    height: 60px;
+    margin-right: 0.5rem;
+}
+
+.channel-img {
+    object-fit: cover;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+}
+
+.custom-channel-info * {
+    margin: 0;
+    padding: 0;
+}
+
+.custom-channel-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.custom-channel-info a {
+    font-size: 14px;
+}
+
+.custom-channel-info p {
+    font-size: 12px;
+}
+
+.channel-info-name {
+    max-width: 120px;
+    text-decoration: none;
+}
+
+.channel-info-name:link,
+.channel-info-name:visited {
+    color: orange;
+}

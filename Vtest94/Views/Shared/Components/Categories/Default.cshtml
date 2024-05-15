@@ -1,0 +1,15 @@
+﻿@model IEnumerable<dynamic>
+
+<div class="custom-widget-inner">
+    <h5 class="custom-widget-title">Categories</h5>
+    <div class="d-flex flex-column">
+        @foreach (var category in Model)
+        {
+            <div class="d-flex custom-widget-item">
+                <div class="custom-channel-info">
+                    <p class="channel-info-videos">@category.Name (@category.VideoCount videos)</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

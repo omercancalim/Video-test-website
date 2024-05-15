@@ -5,7 +5,7 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/video-page.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Main/Middle/video-page.css" asp-append-version="true" />
 }
 
 <!-- <h2>@ViewData["Title"]</h2> -->
@@ -31,7 +31,7 @@
                     <div class="custom-card-body text-white" style="border-bottom-left-radius:6px; border-bottom-right-radius:6px;">
                         <h5 class="card-title">@video.Title</h5>
                         <p class="card-text">@video.Description</p>
-                        <p class="card-text"><small class="text-light">Uploaded on @video.UploadedDate.ToString("g")</small></p>
+                        <p class="card-text"><small class="opacity-75">Uploaded on @video.UploadedDate.ToString("g")</small></p>
                     </div>
                 </div>
             </div>

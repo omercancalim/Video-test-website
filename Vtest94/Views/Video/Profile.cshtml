@@ -4,7 +4,9 @@
     ViewData["Title"] = "My Videos";
 }
 
-<link rel="stylesheet" href="~/css/video-page.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/Main/Middle/video-page.css" asp-append-version="true" />
+}
 
 <h2>@ViewData["Title"]</h2>
 
@@ -25,10 +27,10 @@
                         <source src="@Url.Content($"~/videos/{video.FileName}")" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <div class="card-body">
+                    <div class="custom-card-body text-white">
                         <h5 class="card-title">@video.Title</h5>
                         <p class="card-text">@video.Description</p>
-                        <p class="card-text"><small class="text-muted">Uploaded on @video.UploadedDate.ToString("g")</small></p>
+                        <p class="card-text"><small class="opacity-75">Uploaded on @video.UploadedDate.ToString("g")</small></p>
                     </div>
                 </div>
             </div>

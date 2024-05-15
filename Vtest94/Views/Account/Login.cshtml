@@ -7,7 +7,11 @@
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
 }
 
-<div class="login-form">
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account/Login.css" asp-append-version="true" />
+}
+
+<div class="login-form text-white">
     <h2>Login</h2>
     <form asp-action="Login" asp-controller="Account" method="post" class="form-horizontal">
         <div class="mb-3">
@@ -26,8 +30,8 @@
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
-    <hr />
-    <form asp-action="LoginWithGoogle" method="get" class="mt-2">
+    <hr class="text-bg-danger w-100"/>
+    <form asp-action="LoginWithGoogle" method="get">
         <button type="submit" value="Login with Google" class="btn btn-danger">
             <i class="fab fa-google"></i> Login with Google
         </button>

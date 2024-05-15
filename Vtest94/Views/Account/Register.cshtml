@@ -7,7 +7,11 @@
     Layout = "~/Views/Shared/_AccountLayout.cshtml"; // Ensure you are using the correct layout
 }
 
-<div class="register-form">
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account/Register.css" asp-append-version="true" />
+}
+
+<div class="register-form text-white">
     <h2>Register</h2>
     <form asp-action="Register" asp-controller="Account" method="post" class="form-horizontal">
         <div class="mb-3">
@@ -37,9 +41,9 @@
         </div>
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
-    <hr />
+    <hr class="text-bg-danger w-100"/>
     <!-- Google Signup Button -->
-    <form asp-action="ExternalLogin" asp-controller="Account" method="post" class="mt-2">
+    <form asp-action="ExternalLogin" asp-controller="Account" method="post">
         <button type="submit" name="provider" value="Google" class="btn btn-danger">
             <i class="fab fa-google"></i> Signup with Google
         </button>

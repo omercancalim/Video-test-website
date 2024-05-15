@@ -5,14 +5,14 @@
     border-radius: 5px;
 }
 
-    .user-profile h2, .user-profile h3 {
-        color: #333;
-    }
+.user-profile h2, .user-profile h3 {
+    color: #333;
+}
 
-    .user-profile ul {
-        list-style-type: none;
-        padding: 0;
-    }
+.user-profile ul {
+    list-style-type: none;
+    padding: 0;
+}
 
 .custom-circle-img {
     object-fit: cover;

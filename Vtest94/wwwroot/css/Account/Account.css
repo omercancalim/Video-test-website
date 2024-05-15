@@ -1,0 +1,31 @@
+﻿body {
+    background: linear-gradient(135deg, #660000, #0f005a, #330033);
+    background-attachment: fixed; /* Keeps the background fixed during scrolling */
+    color: #ffffff;
+}
+
+input[type="email"], input[type="password"], input[type="text"] {
+    width: 300px;
+    background-color: #1a237e;
+    color: #FFD700;
+    border-radius: 4px;
+    caret-color: #FFD700;
+}
+
+input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+    background-color: #0a005d;
+    color: #FFD700;
+    border-color: #FFD700;
+}
+
+/* Ensuring autofill maintains the style */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #FFD700 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1a237e inset;
+}
+
+.custom-mt {
+    margin-top: 3.5rem;
+}
