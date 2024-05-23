@@ -1,0 +1,25 @@
+﻿.c-icon {
+    padding: 0.25em 0.5em;
+    font-size: 21px;
+    border-radius: 8px;
+}
+
+.c-bg-red {
+    background-color: #c30000;
+}
+
+.c-bg-blue {
+    background-color: #0000d1;
+}
+
+.c-bg-black {
+    background-color: #000;
+}
+
+.c-bg-dark-blue {
+    background-color: darkblue;
+}
+
+.c-bg-violetred {
+    background-color: mediumvioletred;
+}

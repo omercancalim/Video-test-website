@@ -1,0 +1,45 @@
+﻿p {
+    margin-bottom: 0 !important;
+}
+
+.selected-video-container {
+    position: relative;
+    overflow: hidden;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.selected-video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    }
+
+.selected-content {
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #272727;
+}
+
+.selected-user-info {
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.user-photo img {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+.user-details {
+    flex-grow: 1;
+}
+
+.like-dislike-buttons .btn {
+    margin-left: 0.5rem;
+}

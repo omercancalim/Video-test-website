@@ -1,13 +1,44 @@
 ﻿@model IEnumerable<dynamic>
 
-<div class="custom-widget-inner">
-    <h5 class="custom-widget-title">Categories</h5>
+@{
+    ViewData["Title"] = "Categories";
+
+    // Define an array of divs for each category
+    var categoryDivs = new List<string>
+    {
+        @"<i class='fas fa-graduation-cap'></i>", // Education
+        @"<i class='fas fa-theater-masks'></i>",  // Entertainment
+        @"<i class='fas fa-music'></i>",          // Music
+        @"<i class='fas fa-football-ball'></i>",  // Sports
+        @"<i class='fas fa-laptop-code'></i>"     // Technology
+    };
+
+    // Ensure the divs align with the order of categories
+    var categoryNames = new List<string>
+    {
+        "Education",
+        "Entertainment",
+        "Music",
+        "Sports",
+        "Technology"
+    };
+}
+
+<div class="c-categories-aside">
+    <h5 class="c-categories-title">Categories</h5>
     <div class="d-flex flex-column">
         @foreach (var category in Model)
         {
-            <div class="d-flex custom-widget-item">
-                <div class="custom-channel-info">
-                    <p class="channel-info-videos">@category.Name (@category.VideoCount videos)</p>
+            <div class="c-categories-item">
+                <div class="d-flex">
+                    <a asp-controller="Video" asp-action="CategoryVideos" asp-route-categoryId="@category.Id" asp-route-categoryName="@category.Name" class="c-category-link d-flex">
+                        <p class="fs-14px text-secondary">
+                            @Html.Raw(@categoryDivs[categoryNames.IndexOf(category.Name)])
+                        </p>
+
+                        <p class="fs-14px ms-2 text-secondary fw-bold">@category.Name</p>
+                    </a>
+                    <p class="fs-14px ms-1 text-secondary fw-bold">(@category.VideoCount)</p>
                 </div>
             </div>
         }

@@ -1,5 +1,9 @@
 ﻿@model List<Vtest94.Models.User>
 
+@{
+    int imgCounter = 0;  // Initialize the counter variable
+}
+
 <div class="custom-widget-inner">
     <h5 class="custom-widget-title">Top Users</h5>
     <div class="d-flex flex-column">
@@ -8,7 +12,7 @@
             <div class="d-flex custom-widget-item">
                 <div class="custom-channel-picture">
                     <a asp-controller="User" asp-action="Profile" asp-route-userId="@user.Id" title="@user.UserName">
-                        <img class="channel-img" src="~/thumbnails/thumbnail_5a5f5f15-515c-4f74-95ad-84f3b3d638cf.jpg" alt="@user.UserName">
+                        <img class="channel-img" src="https://picsum.photos/seed/@imgCounter/200" alt="@user.UserName">
                     </a>
                 </div>
                 <div class="custom-channel-info">
@@ -17,6 +21,7 @@
                     <p class="channel-info-views">28134 views</p>
                 </div>
             </div>
+            imgCounter++;
         }
     </div>
 </div>

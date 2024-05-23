@@ -79,14 +79,35 @@ namespace Vtest94.Repositories
             // return await _context.Videos.ToListAsync();
         }
 
+        public async Task<IEnumerable<Video>> GetAllLatestVideosAsync()
+        {
+            IQueryable<Video> query = _context.Videos;
+
+            query = query.OrderByDescending(v => v.UploadedDate);
+
+            return await query.ToListAsync();
+        }
+
         public async Task<Video> GetVideoByIdAsync(int id)
         {
             return await _context.Videos.FindAsync(id);
         }
 
+        public async Task<Video> GetVideoAndUserByIdAsync(int id)
+        {
+            return await _context.Videos
+                                  .Include(v => v.User)
+                                  .FirstOrDefaultAsync(v => v.Id == id);
+        }
+
         public async Task<IEnumerable<Video>> GetVideosByUserIdAsync(string userId)
         {
             return await _context.Videos.Where(v => v.UserId == userId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Video>> GetVideosByCategoryIdAsync(int categoryId)
+        {
+            return await _context.Videos.Where(v => v.CategoryId == categoryId).ToListAsync();
         }
     }
 }

@@ -14,27 +14,27 @@
 <div class="register-form text-white">
     <h2>Register</h2>
     <form asp-action="Register" asp-controller="Account" method="post" class="form-horizontal">
-        <div class="mb-3">
+        <div class="mb-3 maxw-300px">
             <label asp-for="Email" class="form-label">Email address</label>
             <input asp-for="Email" class="form-control"/>
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 maxw-300px">
             <label asp-for="FirstName" class="form-label">First Name</label>
             <input asp-for="FirstName" class="form-control" />
             <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 maxw-300px">
             <label asp-for="LastName" class="form-label">Last Name</label>
             <input asp-for="LastName" class="form-control" />
             <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 maxw-300px">
             <label asp-for="Password" class="form-label">Password</label>
             <input asp-for="Password" type="password" class="form-control" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 maxw-300px">
             <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
             <input asp-for="ConfirmPassword" type="password" class="form-control" />
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>

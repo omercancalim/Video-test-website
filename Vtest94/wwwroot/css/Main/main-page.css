@@ -3,6 +3,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    background-color: #1d1f20 !important;
 }
 
 input.form-control:-webkit-autofill,
@@ -59,19 +60,22 @@ button.identifier.dropdown-toggle::after {
 }
 
 .left-panel {
-    flex: 0 0 15%; /* Fixed at 15% */
+    flex: 0 0 15%;
     background-color: #1f2223;
-    padding: 20px 10px;
 }
 
 .middle-panel {
-    flex: 0 0 70%; /* Fixed at 70% */
+    flex: 0 0 65%;
     background-color: #181a1b;
 }
 
 .right-panel {
-    flex: 0 0 15%; /* Fixed at 15% */
-    background-color: #f8f9fa;
+    flex: 0 0 20%;
+    background-color: #1f2223;
+}
+
+.right-panel aside {
+    margin-bottom: 40px;
 }
 
 .dropdown-menu li {

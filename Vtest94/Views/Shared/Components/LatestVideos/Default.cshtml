@@ -1,0 +1,22 @@
+﻿@model List<Vtest94.Models.Video>
+
+<div class="d-flex align-items-baseline mb-3">
+    <i class="fas fa-play"></i>
+    <p class="ms-2 mb-0">Latest Videos</p>
+</div>
+<div class="d-flex flex-column">
+    @foreach (var video in Model)
+    {
+        <div class="d-flex mb-3">
+            <div class="latest-video-thumbnail-cont">
+                <a asp-controller="Video" asp-action="SelectedVideo" asp-route-videoId="@video.Id" title="@video.Title">
+                    <img class="latest-video-thumbnail" src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" alt="@video.Title">
+                </a>
+            </div>
+            <div class="latest-video-info d-flex flex-column">
+                <a asp-controller="Video" asp-action="SelectedVideo" asp-route-videoId="@video.Id" class="latest-video-name mb-2 link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover">@video.Title</a>
+                <p class="latest-video-date fs-12px mb-0">@video.UploadedDate.ToString("dd MMM HH:mm")</p>
+            </div>
+        </div>
+    }
+</div>

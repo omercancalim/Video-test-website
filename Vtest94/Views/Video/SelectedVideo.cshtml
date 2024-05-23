@@ -1,0 +1,44 @@
+﻿@model Vtest94.Models.Video
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Main/Middle/SelectedVideo.css" asp-append-version="true" />
+}
+
+<div class="container p-0">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-2">@Model.Title</h2>
+            <div class="selected-video-container mb-2">
+                <video controls>
+                    <source src="@Url.Content($"~/videos/{Model.FileName}")" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="selected-user-info p-3">
+                <div class="user-photo me-3">
+                    <a asp-controller="User" asp-action="Profile" asp-route-userId="@Model.User.Id" title="@Model.User.UserName">
+                        <img src="~/thumbnails/thumbnail_06291944-ba66-4023-b514-c101b09284f1.jpg" alt="User Photo" class="rounded-circle">
+                    </a>
+                </div>
+                <div class="user-details flex-grow-1">
+                    <a asp-controller="User" asp-action="Profile" asp-route-userId="@Model.User.Id" title="@Model.User.UserName" class="text-decoration-none text-white">
+                        <p class="mb-1">@Model.User.UserName</p>
+                    </a>
+                    <p>422k subscribers</p>
+                </div>
+                <div class="like-dislike-buttons">
+                    <button type="button" class="btn btn-outline-success me-2">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger">
+                        <i class="fa-solid fa-thumbs-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="selected-content">
+                <p>@Model.Description</p>
+            </div>
+        </div>
+    </div>
+</div>
+

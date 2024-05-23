@@ -1,10 +1,6 @@
 ﻿@using Vtest94.ViewModels;
 @model CreateVideoViewModel
 
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
 @section Scripts {
     <script src="~/js/videoUpload.js"></script>
 }
@@ -14,18 +10,18 @@
     <!-- Bind to the properties of the Video object -->
     <div class="form-group">
         <label asp-for="Video.Title"></label>
-        <input asp-for="Video.Title" class="form-control" />
+        <input asp-for="Video.Title" class="form-control text-white" />
         <span asp-validation-for="Video.Title" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Video.Description"></label>
-        <textarea asp-for="Video.Description" class="form-control"></textarea>
+        <textarea asp-for="Video.Description" class="form-control text-white"></textarea>
         <span asp-validation-for="Video.Description" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="SelectedCategoryId">Category</label>
-        <select asp-for="SelectedCategoryId" asp-items="Model.Categories" class="form-control">
+        <select asp-for="SelectedCategoryId" asp-items="Model.Categories" class="form-control text-white">
             <option value="">Please select a category</option>
         </select>
         <span asp-validation-for="SelectedCategoryId" class="text-danger"></span>

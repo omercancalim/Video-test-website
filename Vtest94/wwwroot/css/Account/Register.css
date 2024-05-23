@@ -18,3 +18,7 @@
     flex-direction: column;
     width: 100%;
 }
+
+.maxw-300px {
+    max-width: 300px;
+}

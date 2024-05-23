@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Vtest94.Data;
 using Vtest94.Interfaces;
 using Vtest94.Models;
@@ -31,6 +32,15 @@ namespace Vtest94.Controllers
             return View(videos);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchVideo(string searchString)
+        {
+            ViewData["CurrentFilter"] = searchString;
+            var videos = await _videoRepository.GetAllVideosAsync(searchString);
+            return View(videos);
+        }
+
         // Display the form for uploading a new video
         [Authorize]
         public async Task<IActionResult> Create()
@@ -46,7 +56,7 @@ namespace Vtest94.Controllers
         // Process the form submission for a new video
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [RequestSizeLimit(100_000_000)]
+        [RequestSizeLimit(200_000_000)]
         [Authorize]
         public async Task<IActionResult> Create(CreateVideoViewModel videoViewModel)
         {
@@ -87,6 +97,63 @@ namespace Vtest94.Controllers
 
             var videos = await _videoRepository.GetVideosByUserIdAsync(user.Id); // Fetch videos by user ID
             return View(videos);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> CategoryVideos(int categoryId, string categoryName)
+        {
+            var videos = await _videoRepository.GetVideosByCategoryIdAsync(categoryId);
+
+            // ViewBag.CategoryName is set to the categoryName parameter directly
+            ViewBag.CategoryName = categoryName ?? "Category";
+
+            return View(videos);
+        }
+
+        // New method for fetching videos dynamically
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("api/videos")]
+        public async Task<IActionResult> GetVideos(string searchString = null, int page = 1, int pageSize = 4)
+        {
+            if(searchString == "latest")
+            {
+                var latestVideos = await _videoRepository.GetAllLatestVideosAsync();
+                var totalVideos = latestVideos.Count();
+                var paginatedVideos = latestVideos.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+                return Ok(new { TotalCount = totalVideos, Videos = paginatedVideos });
+            }
+            else
+            {
+                var videos = await _videoRepository.GetAllVideosAsync(searchString);
+                var totalVideos = videos.Count();
+                var paginatedVideos = videos.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+                return Ok(new { TotalCount = totalVideos, Videos = paginatedVideos });
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("api/videos/game")]
+        public async Task<IActionResult> GetGameVideos(int page = 1, int pageSize = 4)
+        {
+            var sportVideos = await _videoRepository.GetVideosByCategoryIdAsync(3);
+            var totalVideos = sportVideos.Count();
+            var paginatedVideos = sportVideos.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            return Ok(new { TotalCount = totalVideos, Videos = paginatedVideos });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> SelectedVideo(int videoId)
+        {
+            var selectedVideo = await _videoRepository.GetVideoAndUserByIdAsync(videoId);
+
+            if (selectedVideo == null)
+            {
+                return NotFound();
+            }
+
+            return View(selectedVideo);
         }
     }
 }

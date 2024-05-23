@@ -1,0 +1,41 @@
+﻿.c-categories-item div p,
+.c-categories-item div a p {
+    margin: 0;
+}
+
+.c-categories-item:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.fs-11px {
+    font-size: 11px;
+}
+
+.fs-12px {
+    font-size: 12px;
+}
+
+.fs-13px {
+    font-size: 13px;
+}
+
+.fs-14px {
+    font-size: 14px;
+}
+
+.h-1px {
+    height: 1px !important;
+}
+
+.c-category-link {
+    text-decoration: none;
+}
+
+.c-category-link p {
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.c-category-link:hover p {
+    color: white !important;
+}

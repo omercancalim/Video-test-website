@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\css\Main\RightSide\" />
     <Folder Include="wwwroot\videos\" />
     <Folder Include="wwwroot\thumbnails\" />
   </ItemGroup>

@@ -10,52 +10,210 @@
 
 <!-- <h2>@ViewData["Title"]</h2> -->
 
-@if (Model != null && Model.Any())
-{
-    <div class="row">
-        @foreach (var video in Model)
-        {
-            <div class="col-md-4">
-                <div class="card mb-4 video-container">
-                    <div class="thumbnail-container position-relative">
-                        <img src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" class="card-img-top video-thumbnail" alt="Video Thumbnail">
-                        <!-- Adding a button to play the video, assuming JavaScript handles play functionality -->
-                        <button class="btn btn-play position-absolute top-50 start-50 translate-middle" onclick="playVideo(this)">
-                            <img src="~/auxiliary/play-button.png" alt="Play" style="width: 64px;"> <!-- Size adjusted for better UX -->
-                        </button>
-                    </div>
-                    <video controls class="w-100" style="display:none; border-radius:6px;">
-                        <source src="@Url.Content($"~/videos/{video.FileName}")" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <div class="custom-card-body text-white" style="border-bottom-left-radius:6px; border-bottom-right-radius:6px;">
-                        <h5 class="card-title">@video.Title</h5>
-                        <p class="card-text">@video.Description</p>
-                        <p class="card-text"><small class="opacity-75">Uploaded on @video.UploadedDate.ToString("g")</small></p>
-                    </div>
-                </div>
-            </div>
-        }
+<div class="tv-container home-main-container">
+    <div class="left">
+        <img src="https://picsum.photos/1000/1000" alt="Large Image" class="big-img">
+        <div class="tv-video-info position-absolute">
+            <p class="fw-bold">Video name</p>
+            <p class="text-gray">Video uploader / video date</p>
+        </div>
     </div>
-}
-else
-{
-    <p>No videos have been uploaded yet.</p>
-}
+    <div class="right">
+        <div class="right-sub">
+            <img src="https://picsum.photos/1000/1000" alt="Small Image 1" class="small-img">
+            <div class="tv-video-info position-absolute">
+                <p class="fw-bold">Video name</p>
+                <p class="text-gray">Video uploader / video date</p>
+            </div>
+        </div>
+        <div class="right-sub">
+            <img src="https://picsum.photos/1000/1000" alt="Small Image 2" class="small-img">
+            <div class="tv-video-info position-absolute">
+                <p class="fw-bold">Video name</p>
+                <p class="text-gray">Video uploader / video date</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="submenu-divider"/>
+
+<div class="latest-slider-container home-main-container">
+    <div class="controls mb-3">
+        <div class="inner-controls d-flex">
+            <button class="btn btn-dark filter-btn" data-filter="latest">Latest</button>
+            <button class="btn btn-dark filter-btn" data-filter="top-viewed">Top Viewed</button>
+            <button class="btn btn-dark filter-btn" data-filter="all">See All Videos</button>
+        </div>
+        <div class="inner-controls d-flex">
+            <button class="btn btn-dark" id="prev-btn">
+                <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <button class="btn btn-dark" id="next-btn">
+                <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </div>
+
+    </div>
+    <div class="video-container" id="video-container">
+        <!-- Videos will be loaded here -->
+    </div>
+</div>
+
+<hr class="submenu-divider" />
+
+<div class="latest-slider-container home-main-container">
+    <div class="controls mb-3">
+        <div>
+            <h2>Sport Videos</h2>
+        </div>
+        <div class="inner-controls d-flex">
+            <button class="btn btn-dark" id="game-prev-btn">
+                <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <button class="btn btn-dark" id="game-next-btn">
+                <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </div>
+
+    </div>
+    <div class="video-container" id="game-video-container">
+        <!-- Videos will be loaded here -->
+    </div>
+</div>
 
 @section Scripts {
     <script>
-        document.querySelectorAll('.video-container').forEach(container => {
-            const playButton = container.querySelector('.btn-play');
-            const video = container.querySelector('video');
-            const thumbnail = container.querySelector('.video-thumbnail');
+        let currentPage = 1;
+        const videosPerPage = 4;
+        let totalVideos = 0;
+        let filter = '';
+        let tempFilter = '';
 
-            playButton.addEventListener('click', () => {
-                thumbnail.style.display = 'none';
-                playButton.style.display = 'none';
-                video.style.display = 'block';
-                video.play();
+        async function fetchVideos(page, filter = '') {
+            const response = await fetch(`/api/videos?page=${page}&pageSize=${videosPerPage}${filter ? `&searchString=${filter}` : ''}`);
+            const data = await response.json();
+            totalVideos = data.totalCount;
+            return data.videos;
+        }
+
+        function renderVideos(videos) {
+            const container = document.getElementById('video-container');
+            container.innerHTML = '';
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `
+                                    <a href="/Video/SelectedVideo?videoId=${video.id}">
+                                        <img src="/thumbnails/${video.thumbnailName}" alt="${video.title}">
+                                    </a>
+                                    <a href="/Video/SelectedVideo?videoId=${video.id}" class="link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                                        <p class="video-title">${video.title}</p>
+                                    </a>
+                                    <div>
+                                        <p>${video.description}</p>
+                                    </div>
+                                `;
+                container.appendChild(videoItem);
+            });
+
+            const totalPages = Math.ceil(totalVideos / videosPerPage);
+            document.getElementById('next-btn').disabled = currentPage >= totalPages;
+
+            document.getElementById('prev-btn').disabled = currentPage == 1;
+        }
+
+        document.getElementById('next-btn').addEventListener('click', async () => {
+            currentPage++;
+            const videos = await fetchVideos(currentPage, filter);
+            renderVideos(videos);
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', async () => {
+            if (currentPage > 1) {
+                currentPage--;
+                const videos = await fetchVideos(currentPage, filter);
+                renderVideos(videos);
+            }
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                filter = e.target.getAttribute('data-filter');
+                currentPage = 1;
+                
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                button.classList.add('selected');
+
+                const videos = await fetchVideos(currentPage, filter);
+                renderVideos(videos);
             });
         });
+
+        // Initial render
+        (async () => {
+            const videos = await fetchVideos(currentPage);
+            renderVideos(videos);
+        })();
+
+
+        let currentGamePage = 1;
+        const videosGamePerPage = 4;
+        let totalGameVideos = 0;
+
+        async function fetchGameVideos(page) {
+            const response = await fetch(`/api/videos/game?page=${page}&pageSize=${videosPerPage}`);
+            const data = await response.json();
+            totalGameVideos = data.totalCount;
+            return data.videos;
+        }
+
+        function renderGameVideos(videos) {
+            const container = document.getElementById('game-video-container');
+            container.innerHTML = '';
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `
+                        <a href="/Video/SelectedVideo?videoId=${video.id}">
+                            <img src="/thumbnails/${video.thumbnailName}" alt="${video.title}">
+                        </a>
+                        <a href="/Video/SelectedVideo?videoId=${video.id}" class="link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                            <p class="video-title">${video.title}</p>
+                        </a>
+                        <div>
+                            <p>${video.description}</p>
+                        </div>
+                                `;
+                container.appendChild(videoItem);
+            });
+
+            const totalPages = Math.ceil(totalGameVideos / videosGamePerPage);
+            document.getElementById('game-next-btn').disabled = currentGamePage >= totalPages;
+
+            document.getElementById('game-prev-btn').disabled = currentGamePage == 1;
+        }
+
+        document.getElementById('game-next-btn').addEventListener('click', async () => {
+            currentGamePage++;
+            const videos = await fetchGameVideos(currentGamePage, filter);
+            renderGameVideos(videos);
+        });
+
+        document.getElementById('game-prev-btn').addEventListener('click', async () => {
+            if (currentGamePage > 1) {
+                currentGamePage--;
+                const videos = await fetchGameVideos(currentGamePage, filter);
+                renderGameVideos(videos);
+            }
+        });
+
+        // Initial render
+        (async () => {
+            const videos = await fetchGameVideos(currentGamePage);
+            renderGameVideos(videos);
+        })();
     </script>
 }

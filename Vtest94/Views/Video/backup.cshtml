@@ -1,0 +1,120 @@
+﻿@model IEnumerable<Vtest94.Models.Video>
+
+@{
+    ViewData["Title"] = "Uploaded Videos";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Main/Middle/video-page.css" asp-append-version="true" />
+}
+
+<!-- <h2>@ViewData["Title"]</h2> -->
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        @foreach (var video in Model)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 video-container">
+                    <div class="thumbnail-container position-relative">
+                        <img src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" class="card-img-top video-thumbnail" alt="Video Thumbnail">
+                        <div class="duration-box">@FormatDuration(video.Duration)</div>
+                    </div>
+                    <video controls class="w-100" style="display:none; border-radius:6px;">
+                        <source src="@Url.Content($"~/videos/{video.FileName}")" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="custom-card-body text-white" style="border-bottom-left-radius:6px; border-bottom-right-radius:6px;">
+                        <h5 class="card-title">@video.Title</h5>
+                        <p class="card-text">@video.Description</p>
+                        <p class="card-text"><small class="opacity-75">@GetRelativeTime(video.UploadedDate)</small></p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No videos have been uploaded yet.</p>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const thumbnailContainers = document.querySelectorAll('.thumbnail-container');
+            thumbnailContainers.forEach(container => {
+                const thumbnail = container.querySelector('.video-thumbnail');
+                const video = container.nextElementSibling;
+                const durationBox = container.querySelector('.duration-box');
+
+                container.addEventListener('click', () => {
+                    thumbnail.style.display = 'none';
+                    durationBox.style.display = 'none';
+                    video.style.display = 'block';
+                    video.play();
+                });
+            });
+        });
+    </script>
+}
+
+@functions {
+    // Helper method to format TimeSpan
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.Days > 0)
+        {
+            // Format string for durations with days
+            return string.Format("{0}:{1:D2}:{2:D2}:{3:D2}", duration.Days, duration.Hours, duration.Minutes, duration.Seconds);
+        }
+        else if (duration.Hours > 0)
+        {
+            // Format string for durations with hours
+            return string.Format("{0}:{1:D2}:{2:D2}", duration.Hours, duration.Minutes, duration.Seconds);
+        }
+        else
+        {
+            // Format string for durations less than an hour
+            return string.Format("{0}:{1:D2}", duration.Minutes, duration.Seconds);
+        }
+    }
+
+    // Helper method to get relative time
+    private static string GetRelativeTime(DateTime dateTime)
+    {
+        var currentTime = DateTime.UtcNow;
+        var timeSpan = currentTime.Subtract(dateTime);
+
+        // Debugging: Print currentTime and dateTime
+        System.Diagnostics.Debug.WriteLine($"Current Time (UTC): {currentTime}");
+        System.Diagnostics.Debug.WriteLine($"Uploaded Date (UTC): {dateTime.ToUniversalTime()}");
+        System.Diagnostics.Debug.WriteLine($"Time Span: {timeSpan}");
+
+        if (timeSpan <= TimeSpan.FromSeconds(60))
+        {
+            return "just now";
+        }
+        else if (timeSpan <= TimeSpan.FromMinutes(60))
+        {
+            return $"{timeSpan.Minutes} minutes ago";
+        }
+        else if (timeSpan <= TimeSpan.FromHours(24))
+        {
+            return $"{timeSpan.Hours} hours ago";
+        }
+        else if (timeSpan <= TimeSpan.FromDays(30))
+        {
+            return $"{timeSpan.Days} days ago";
+        }
+        else if (timeSpan <= TimeSpan.FromDays(365))
+        {
+            return $"{timeSpan.Days / 30} months ago";
+        }
+        else
+        {
+            return $"{timeSpan.Days / 365} years ago";
+        }
+    }
+}

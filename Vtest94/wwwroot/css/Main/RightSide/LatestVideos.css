@@ -1,0 +1,39 @@
+﻿.fs-11px {
+    font-size: 11px;
+}
+
+.fs-12px {
+    font-size: 12px;
+}
+
+.fs-13px {
+    font-size: 13px;
+}
+
+.fs-14px {
+    font-size: 14px;
+}
+
+.latest-video-info {
+    margin-left: 8px;
+    max-width: 165px;
+}
+
+.latest-video-thumbnail {
+    width: 95px;
+    height: 64px;
+    object-fit: cover;
+}
+
+.latest-video-name {
+    line-height: 19px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.latest-video-date {
+    color: gray;
+}
