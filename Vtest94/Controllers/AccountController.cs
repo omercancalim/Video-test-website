@@ -5,6 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Vtest94.Models;
 using Vtest94.ViewModels;
+using Vtest94.Utilities;
+using Microsoft.EntityFrameworkCore;
+using Vtest94.Data;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace Vtest94.Controllers
 {
@@ -12,11 +17,15 @@ namespace Vtest94.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, AppDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
         // GET: /Account/Login
         public IActionResult Login()
@@ -40,6 +49,23 @@ namespace Vtest94.Controllers
 
             if (ModelState.IsValid)
             {
+                // This is helper code for if user's UserName different from email address
+
+                /*var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    // User not found
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return View(model);
+                }
+
+                // Check if email is confirmed (if required)
+                if (_userManager.Options.SignIn.RequireConfirmedEmail && !await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    ModelState.AddModelError(string.Empty, "You need to confirm your email before logging in.");
+                    return View(model);
+                }*/
+
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -141,17 +167,41 @@ namespace Vtest94.Controllers
         {
             if (ModelState.IsValid)
             {
+                var aUsername = await UniqueUsername(model.FirstName, model.LastName);
+
                 var user = new User
                 {
-                    UserName = model.Email, // UserName is required for Identity
+                    UserName = model.Email,
                     Email = model.Email,
                     FirstName = model.FirstName,
-                    LastName = model.LastName
+                    LastName = model.LastName,
+                    ArbitraryUsername = aUsername
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    // Set default profile photo
+                    var defaultPhotoPath = Path.Combine(_webHostEnvironment.WebRootPath, "auxiliary", "general-user-photo.jpg");
+                    var userPhotoDirectory = Path.Combine(_webHostEnvironment.WebRootPath, "UserPhotos", user.Id);
+                    Directory.CreateDirectory(userPhotoDirectory);
+                    var userPhotoPath = Path.Combine(userPhotoDirectory, "profile.jpg");
+
+                    System.IO.File.Copy(defaultPhotoPath, userPhotoPath, true);
+
+                    var userPhoto = new UserPhoto
+                    {
+                        FileName = "profile.jpg",
+                        FilePath = $"/UserPhotos/{user.Id}/profile.jpg",
+                        UserId = user.Id
+                    };
+
+                    _context.UserPhotos.Add(userPhoto);
+                    await _context.SaveChangesAsync();
+
+                    user.UserPhoto = userPhoto;
+                    await _userManager.UpdateAsync(user);
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Login", "Account");
                 }
@@ -199,8 +249,10 @@ namespace Vtest94.Controllers
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);  // Extracting first name
                 var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);    // Extracting last name
+     
+                var username = await UniqueUsername(firstName, lastName);
 
-                var user = new User { UserName = email, Email = email, FirstName = firstName, LastName = lastName };
+                var user = new User { UserName = email, Email = email, FirstName = firstName, LastName = lastName, ArbitraryUsername = username };
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -208,8 +260,30 @@ namespace Vtest94.Controllers
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
+                        // Set default profile photo
+                        var defaultPhotoPath = Path.Combine(_webHostEnvironment.WebRootPath, "auxiliary", "general-user-photo.jpg");
+                        var userPhotoDirectory = Path.Combine(_webHostEnvironment.WebRootPath, "UserPhotos", user.Id);
+                        Directory.CreateDirectory(userPhotoDirectory);
+                        var userPhotoPath = Path.Combine(userPhotoDirectory, "profile.jpg");
+
+                        System.IO.File.Copy(defaultPhotoPath, userPhotoPath, true);
+
+                        var userPhoto = new UserPhoto
+                        {
+                            FileName = "profile.jpg",
+                            FilePath = $"/UserPhotos/{user.Id}/profile.jpg",
+                            UserId = user.Id
+                        };
+
+                        _context.UserPhotos.Add(userPhoto);
+                        await _context.SaveChangesAsync();
+
+                        user.UserPhoto = userPhoto;
+                        await _userManager.UpdateAsync(user);
+
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl ?? "/");
+                        //return LocalRedirect(returnUrl ?? "/");
+                        return RedirectToAction("Login", "Account");
                     }
                 }
 
@@ -225,6 +299,21 @@ namespace Vtest94.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Video");
+        }
+
+        private async Task<string> UniqueUsername(string firstName, string lastName)
+        {
+            string baseUsername = $"{firstName}{lastName}";
+            string username = baseUsername;
+            int counter = 1;
+
+            while (await _userManager.FindByNameAsync(username) != null)
+            {
+                username = $"{baseUsername}{counter}";
+                counter++;
+            }
+
+            return username;
         }
     }
 }

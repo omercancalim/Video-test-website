@@ -16,13 +16,13 @@
             </div>
             <div class="selected-user-info p-3">
                 <div class="user-photo me-3">
-                    <a asp-controller="User" asp-action="Profile" asp-route-userId="@Model.User.Id" title="@Model.User.UserName">
-                        <img src="~/thumbnails/thumbnail_06291944-ba66-4023-b514-c101b09284f1.jpg" alt="User Photo" class="rounded-circle">
+                    <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@Model.User.Id" title="@Model.User.ArbitraryUsername">
+                        <img src="@Url.Content($"~/UserPhotos/{Model.User.Id}/profile.jpg?v=" + DateTime.Now.Ticks)" alt="User Photo" class="rounded-circle">
                     </a>
                 </div>
                 <div class="user-details flex-grow-1">
-                    <a asp-controller="User" asp-action="Profile" asp-route-userId="@Model.User.Id" title="@Model.User.UserName" class="text-decoration-none text-white">
-                        <p class="mb-1">@Model.User.UserName</p>
+                    <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@Model.User.Id" title="@Model.User.ArbitraryUsername" class="text-decoration-none text-white">
+                        <p class="mb-1">@Model.User.ArbitraryUsername</p>
                     </a>
                     <p>422k subscribers</p>
                 </div>

@@ -89,16 +89,6 @@ namespace Vtest94.Controllers
             }
         }
 
-        [Authorize]
-        public async Task<IActionResult> Profile(string searchString)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Challenge(); // Ensure user is logged in
-
-            var videos = await _videoRepository.GetVideosByUserIdAsync(user.Id); // Fetch videos by user ID
-            return View(videos);
-        }
-
         [AllowAnonymous]
         public async Task<IActionResult> CategoryVideos(int categoryId, string categoryName)
         {

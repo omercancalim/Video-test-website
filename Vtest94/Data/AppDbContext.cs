@@ -17,6 +17,7 @@ namespace Vtest94.Data
         //}
         public DbSet<Video> Videos { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<UserPhoto> UserPhotos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -29,15 +30,19 @@ namespace Vtest94.Data
                 .HasForeignKey(v => v.UserId)
                 .IsRequired();
 
+            // Configure the User-UserPhoto relationship
+            builder.Entity<User>()
+                .HasOne(u => u.UserPhoto)
+                .WithOne(up => up.User)
+                .HasForeignKey<UserPhoto>(up => up.UserId)
+                .IsRequired();
+
             // Configure the Category-Video relationship
             builder.Entity<Category>()
                 .HasMany(c => c.Videos) // A category has many videos
                 .WithOne(v => v.Category) // A video belongs to one category
                 .HasForeignKey(v => v.CategoryId) // Foreign key in the Video table
                 .IsRequired(); // Ensures that the foreign key cannot be null
-
-            // If you need to add more configurations, they can be added here.
-            // Example: Configuring a default schema, or adding indexes.
         }
     }
 }

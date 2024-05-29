@@ -181,6 +181,11 @@ namespace Vtest94.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("ArbitraryUsername")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -246,6 +251,34 @@ namespace Vtest94.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Vtest94.Models.UserPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserPhotos");
                 });
 
             modelBuilder.Entity("Vtest94.Models.Video", b =>
@@ -346,6 +379,17 @@ namespace Vtest94.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vtest94.Models.UserPhoto", b =>
+                {
+                    b.HasOne("Vtest94.Models.User", "User")
+                        .WithOne("UserPhoto")
+                        .HasForeignKey("Vtest94.Models.UserPhoto", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Vtest94.Models.Video", b =>
                 {
                     b.HasOne("Vtest94.Models.Category", "Category")
@@ -372,6 +416,9 @@ namespace Vtest94.Migrations
 
             modelBuilder.Entity("Vtest94.Models.User", b =>
                 {
+                    b.Navigation("UserPhoto")
+                        .IsRequired();
+
                     b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
