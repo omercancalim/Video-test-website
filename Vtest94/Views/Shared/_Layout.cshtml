@@ -73,10 +73,10 @@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <div class="btn-group">
-                                <button type="button" class="btn btn-secondary dropdown-toggle identifier no-box-shadow" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Account
+                                <button type="button" class="dropdown-toggle identifier no-box-shadow" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img id="signedUserPhoto" src="@Url.Content($"~/UserPhotos/{userId}/profile.jpg?v=" + DateTime.Now.Ticks)" alt="Alternate Text" />
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end drop-down-background">
+                                <ul class="dropdown-menu dropdown-menu-end photo-dropdown-bg">
                                     <li>
                                         <a class="dropdown-item fs-6 text-warning hover-bg" asp-controller="User" asp-action="PrivateProfile" asp-route-userId="@userId">
                                             <i class="fa fa-user me-2" aria-hidden="true"></i>Profile
