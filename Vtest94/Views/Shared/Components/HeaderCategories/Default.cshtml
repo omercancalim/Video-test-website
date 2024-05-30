@@ -1,0 +1,11 @@
+﻿@model IEnumerable<dynamic>
+
+@foreach (var category in Model)
+{
+    <li><a asp-controller="Video" 
+        asp-action="CategoryVideos" 
+        asp-route-categoryId="@category.Id"
+        asp-route-categoryName="@category.Name"
+        class="dropdown-item hover-bg text-warning">@category.Name</a>
+    </li>
+}
