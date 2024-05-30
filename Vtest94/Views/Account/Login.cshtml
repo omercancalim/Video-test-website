@@ -5,6 +5,8 @@
 @{
     ViewData["Title"] = "Login";
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    var error = ViewContext.HttpContext.Request.Query["error"].ToString();
+    var errorCode = ViewContext.HttpContext.Request.Query["errorCode"].ToString();
 }
 
 @section Styles {
@@ -38,4 +40,26 @@
     </form>
 </div>
 
+<!-- Error occures -->
+@if (!string.IsNullOrEmpty(error))
+{
+    switch (errorCode)
+    {
+        case "1":
+            <div id="popupInfoBox">@error</div>
+            break;
+        case "2":
+            <div id="popupInfoBox">@error</div>
+            break;
+        case "3":
+            <div id="popupInfoBox">@error <span>Please <a asp-controller="Account" asp-action="Register" class="text-warning">register</a> first.</span></div>
+            break;
+        case "4":
+            <div id="popupInfoBox">@error</div>
+            break;
+        default:
+            <div id="popupInfoBox">@error</div>
+            break;
+    }
+}
 
