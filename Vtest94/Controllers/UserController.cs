@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using Vtest94.Data;
 using Vtest94.Interfaces;
 using Vtest94.Models;
@@ -50,6 +51,14 @@ namespace Vtest94.Controllers
         {
             if (file != null && file.Length > 0)
             {
+                // Allowed MIME types
+                var allowedMimes = new[] { "image/jpeg", "image/png", "image/gif" };
+
+                if (!allowedMimes.Contains(file.ContentType))
+                {
+                    return Json(new { success = false, error = "Invalid file type. Only JPEG, PNG, and GIF files are allowed." });
+                }
+
                 var userId = _userManager.GetUserId(User);
                 var user = await _userManager.FindByIdAsync(userId);
 
@@ -93,6 +102,45 @@ namespace Vtest94.Controllers
             }
 
             return Json(new { success = false });
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("api/user/update")]
+        public async Task<IActionResult> UpdateArbUsername(string newArbUsername)
+        {
+            if (string.IsNullOrEmpty(newArbUsername))
+            {
+                return BadRequest("Username cannot be empty.");
+            }
+
+            // Get the current authenticated user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Update the arbitrary username
+            user.ArbitraryUsername = newArbUsername;
+
+            try
+            {
+                // Save changes to the database
+                await _userRepository.UpdateUserAsync(user);
+                return Ok(new { success = true, message = "Username updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., logging)
+                return StatusCode(500, new { success = false, message = "An error occurred while updating the username.", error = ex.Message });
+            }
         }
     }
 }
