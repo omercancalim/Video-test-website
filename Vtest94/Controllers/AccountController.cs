@@ -107,13 +107,19 @@ namespace Vtest94.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GoogleLoginCallback(string returnUrl = "/Video/Index")
+        public async Task<IActionResult> GoogleLoginCallback(string returnUrl = "/Video/Index", string remoteError = null)
         {
+            if (remoteError != null) {
+                return RedirectToAction("Login", new { error = $"Error from external provider: {remoteError}", errorCode = 1 });
+            }
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 // Consider logging this error
-                return RedirectToAction(nameof(Login));
+                //return RedirectToAction(nameof(Login));
+
+                return RedirectToAction("Login", new { error = "Error loading external login information.", errorCode = 2 });
             }
 
             // Attempt to sign in the user with the external login info
@@ -128,13 +134,14 @@ namespace Vtest94.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                user = new User { UserName = email, Email = email };
-                var createUserResult = await _userManager.CreateAsync(user);
-                if (!createUserResult.Succeeded)
-                {
-                    // Consider logging this error and showing a friendly message to the user
-                    return RedirectToAction(nameof(Login));
-                }
+                //user = new User { UserName = email, Email = email };
+                //var createUserResult = await _userManager.CreateAsync(user);
+                //if (!createUserResult.Succeeded)
+                //{
+                //    // Consider logging this error and showing a friendly message to the user
+                //    return RedirectToAction(nameof(Login));
+                //}
+                return RedirectToAction("Login", new { error = "This account does not exist.", errorCode = 3 });
             }
 
             // Link the external login to the user account and sign in
@@ -142,8 +149,10 @@ namespace Vtest94.Controllers
             if (!addLoginResult.Succeeded)
             {
                 // Consider logging this error
-                return RedirectToAction(nameof(Login));
+                //return RedirectToAction(nameof(Login));
+                return RedirectToAction("Login", new { error = "Failed to link external login. Please try again.", errorCode = 4 });
             }
+
             await _signInManager.SignInAsync(user, isPersistent: false);
             return Redirect(returnUrl);
         }
