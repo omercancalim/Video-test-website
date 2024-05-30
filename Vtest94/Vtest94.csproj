@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\js\Main\LeftSide\" />
+    <Folder Include="wwwroot\js\Main\RightSide\" />
     <Folder Include="wwwroot\UserPhotos\" />
     <Folder Include="wwwroot\videos\" />
     <Folder Include="wwwroot\thumbnails\" />
