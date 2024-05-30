@@ -51,6 +51,12 @@ button.identifier.dropdown-toggle::after {
     content: none;
 }
 
+.identifier {
+    border: none;
+    padding: 0;
+    background-color: transparent;
+}
+
 .no-box-shadow {
     box-shadow:none !important;
 }
@@ -96,4 +102,14 @@ button.identifier.dropdown-toggle::after {
 
 .dropdown-menu li:hover .dropdown-submenu {
     display: block;
+}
+
+#signedUserPhoto {
+    max-height: 40px;
+    max-width: 40px;
+    border-radius: 50%;
+}
+
+.photo-dropdown-bg {
+    background-color: #262a2b !important;
 }
