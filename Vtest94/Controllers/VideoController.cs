@@ -133,7 +133,7 @@ namespace Vtest94.Controllers
             return Ok(new { TotalCount = totalVideos, Videos = paginatedVideos });
         }
 
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> SelectedVideo(int videoId)
         {
             var selectedVideo = await _videoRepository.GetVideoAndUserByIdAsync(videoId);
