@@ -32,3 +32,15 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
 }
+
+.login-form-submit {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.login-form-submit a:visited,
+.login-form-submit a:link {
+    color: white;
+}

@@ -113,3 +113,19 @@ button.identifier.dropdown-toggle::after {
 .photo-dropdown-bg {
     background-color: #262a2b !important;
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #343a40;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
