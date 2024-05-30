@@ -145,5 +145,37 @@ namespace Vtest94.Controllers
 
             return View(selectedVideo);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> IncrementViewCount(int videoId)
+        {
+            var video = await _appDbContext.Videos.Include(v => v.VideoViews).FirstOrDefaultAsync(v => v.Id == videoId);
+            if (video == null)
+            {
+                return NotFound();
+            }
+
+            // Replace with your actual user ID retrieval logic
+            // var userId = await _userManager.GetUserAsync(User).Id;
+            var user = await _userManager.GetUserAsync(User);
+
+            var userView = video.VideoViews.FirstOrDefault(vv => vv.UserId == user.Id && vv.VideoId == videoId);
+            if (userView == null)
+            {
+                // Log the view and increment the count
+                video.ViewCount++;
+                _appDbContext.VideoViews.Add(new VideoView
+                {
+                    VideoId = videoId,
+                    UserId = user.Id,
+                    ViewedAt = DateTime.UtcNow
+                });
+                await _appDbContext.SaveChangesAsync();
+
+                return Ok(new { success = true });
+            }
+
+            return Ok(new { success = false, message = "View already counted" });
+        }
     }
 }

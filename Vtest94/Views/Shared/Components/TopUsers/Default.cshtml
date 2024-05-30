@@ -1,4 +1,4 @@
-﻿@model List<Vtest94.Models.User>
+﻿@model IEnumerable<dynamic>
 
 @{
     int imgCounter = 0;  // Initialize the counter variable
@@ -11,14 +11,14 @@
         {
             <div class="d-flex custom-widget-item">
                 <div class="custom-channel-picture">
-                    <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@user.Id" title="@user.ArbitraryUsername">
-                        <img class="channel-img" src="@Url.Content($"~/UserPhotos/{user.Id}/profile.jpg?v=" + DateTime.Now.Ticks)" alt="@user.UserName">
+                    <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@user.User.Id" title="@user.User.ArbitraryUsername">
+                        <img class="channel-img" src="@Url.Content($"~/UserPhotos/{user.User.Id}/profile.jpg?v=" + DateTime.Now.Ticks)" alt="@user.User.UserName">
                     </a>
                 </div>
                 <div class="custom-channel-info">
-                    <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@user.Id" class="channel-info-name text-truncate">@user.ArbitraryUsername</a>
-                    <p class="channel-info-videos">Videos: @user.Videos.Count</p>
-                    <p class="channel-info-views">28134 views</p>
+                    <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@user.User.Id" class="channel-info-name text-truncate">@user.User.ArbitraryUsername</a>
+                    <p class="channel-info-videos">Videos: @user.VideoCount</p>
+                    <p class="channel-info-views">@user.TotalViews views</p>
                 </div>
             </div>
             imgCounter++;

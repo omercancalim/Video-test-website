@@ -32,5 +32,11 @@ namespace Vtest94.Models
 
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }  // Navigation property
+        
+        // Initialize ViewCount to 0
+        public int ViewCount { get; set; } = 0;
+
+        // Initialize VideoViews to an empty collection
+        public virtual ICollection<VideoView> VideoViews { get; set; } = new List<VideoView>();
     }
 }

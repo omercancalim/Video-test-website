@@ -9,7 +9,7 @@
         <div class="col-12">
             <h2 class="mb-2">@Model.Title</h2>
             <div class="selected-video-container mb-2">
-                <video controls>
+                <video id="videoPlayer" controls>
                     <source src="@Url.Content($"~/videos/{Model.FileName}")" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
@@ -36,9 +36,123 @@
                 </div>
             </div>
             <div class="selected-content">
+                <div class="d-flex" style="gap:10px">
+                    <p>@FormatViewCount((int)Model.ViewCount) view</p>
+                    <p>@GetRelativeTime(@Model.UploadedDate)</p>
+                </div>
                 <p>@Model.Description</p>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var video = document.getElementById('videoPlayer');
+        var isViewed = false;
+
+        video.addEventListener('timeupdate', function () {
+            var percentWatched = (video.currentTime / video.duration) * 100;
+
+            // Check if at least 50% of the video has been watched
+            if (percentWatched >= 25 && !isViewed) {
+                isViewed = true;
+
+                // Send AJAX request to server
+                $.ajax({
+                    url: '@Url.Action("IncrementViewCount", "Video")',
+                    method: 'POST',
+                    data: {
+                        videoId: @Model.Id
+                    },
+                    success: function (response) {
+                        console.log('View recorded successfully');
+                    },
+                    error: function (error) {
+                        console.log('Error recording view', error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+@functions {
+    // Helper method to format TimeSpan
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.Days > 0)
+        {
+            // Format string for durations with days
+            return string.Format("{0}:{1:D2}:{2:D2}:{3:D2}", duration.Days, duration.Hours, duration.Minutes, duration.Seconds);
+        }
+        else if (duration.Hours > 0)
+        {
+            // Format string for durations with hours
+            return string.Format("{0}:{1:D2}:{2:D2}", duration.Hours, duration.Minutes, duration.Seconds);
+        }
+        else
+        {
+            // Format string for durations less than an hour
+            return string.Format("{0}:{1:D2}", duration.Minutes, duration.Seconds);
+        }
+    }
+
+    // Helper method to get relative time
+    private static string GetRelativeTime(DateTime dateTime)
+    {
+        var currentTime = DateTime.UtcNow;
+        var timeSpan = currentTime.Subtract(dateTime);
+
+        // Debugging: Print currentTime and dateTime
+        System.Diagnostics.Debug.WriteLine($"Current Time (UTC): {currentTime}");
+        System.Diagnostics.Debug.WriteLine($"Uploaded Date (UTC): {dateTime.ToUniversalTime()}");
+        System.Diagnostics.Debug.WriteLine($"Time Span: {timeSpan}");
+
+        if (timeSpan <= TimeSpan.FromSeconds(60))
+        {
+            return "just now";
+        }
+        else if (timeSpan <= TimeSpan.FromMinutes(60))
+        {
+            return $"{timeSpan.Minutes} minutes ago";
+        }
+        else if (timeSpan <= TimeSpan.FromHours(24))
+        {
+            return $"{timeSpan.Hours} hours ago";
+        }
+        else if (timeSpan <= TimeSpan.FromDays(30))
+        {
+            return $"{timeSpan.Days} days ago";
+        }
+        else if (timeSpan <= TimeSpan.FromDays(365))
+        {
+            return $"{timeSpan.Days / 30} months ago";
+        }
+        else
+        {
+            return $"{timeSpan.Days / 365} years ago";
+        }
+    }
+
+    public string FormatViewCount(int viewCount)
+    {
+        if (viewCount >= 1_000_000_000)
+        {
+            return (viewCount / 1_000_000_000.0).ToString("0.#") + "B";
+        }
+        else if (viewCount >= 1_000_000)
+        {
+            return (viewCount / 1_000_000.0).ToString("0.#") + "M";
+        }
+        else if (viewCount >= 10_000)
+        {
+            return (viewCount / 1_000.0).ToString("0.#") + "K";
+        }
+        else
+        {
+            return viewCount.ToString();
+        }
+    }
+}

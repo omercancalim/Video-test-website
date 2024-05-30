@@ -17,8 +17,13 @@ public class TopUsersViewComponent : ViewComponent
     public async Task<IViewComponentResult> InvokeAsync()
     {
         var topUsers = await _context.Users
-            .Include(u => u.Videos)
-            .OrderByDescending(u => u.Videos.Count) // Assuming you want to sort by number of videos
+            .Select(u => new
+            {
+                User = u,
+                VideoCount = u.Videos.Count,
+                TotalViews = u.Videos.Sum(v => v.ViewCount)
+            })
+            .OrderByDescending(u => u.VideoCount)
             .Take(7)
             .ToListAsync();
         return View(topUsers);
