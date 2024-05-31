@@ -253,6 +253,33 @@ namespace Vtest94.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Vtest94.Models.UserLikes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsLike")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("VideoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserLikes");
+                });
+
             modelBuilder.Entity("Vtest94.Models.UserPhoto", b =>
                 {
                     b.Property<int>("Id")
@@ -319,7 +346,7 @@ namespace Vtest94.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ViewCount")
+                    b.Property<int?>("VideoStatsId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -328,10 +355,14 @@ namespace Vtest94.Migrations
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("VideoStatsId")
+                        .IsUnique()
+                        .HasFilter("[VideoStatsId] IS NOT NULL");
+
                     b.ToTable("Videos");
                 });
 
-            modelBuilder.Entity("Vtest94.Models.VideoView", b =>
+            modelBuilder.Entity("Vtest94.Models.VideoStats", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -339,23 +370,21 @@ namespace Vtest94.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DislikeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LikeCount")
+                        .HasColumnType("int");
 
                     b.Property<int>("VideoId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ViewedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("VideoId");
-
-                    b.ToTable("VideoViews");
+                    b.ToTable("VideoStats");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -434,28 +463,16 @@ namespace Vtest94.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Vtest94.Models.VideoStats", "VideoStats")
+                        .WithOne()
+                        .HasForeignKey("Vtest94.Models.Video", "VideoStatsId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.Navigation("Category");
 
                     b.Navigation("User");
-                });
 
-            modelBuilder.Entity("Vtest94.Models.VideoView", b =>
-                {
-                    b.HasOne("Vtest94.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vtest94.Models.Video", "Video")
-                        .WithMany("VideoViews")
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("Video");
+                    b.Navigation("VideoStats");
                 });
 
             modelBuilder.Entity("Vtest94.Models.Category", b =>
@@ -469,11 +486,6 @@ namespace Vtest94.Migrations
                         .IsRequired();
 
                     b.Navigation("Videos");
-                });
-
-            modelBuilder.Entity("Vtest94.Models.Video", b =>
-                {
-                    b.Navigation("VideoViews");
                 });
 #pragma warning restore 612, 618
         }

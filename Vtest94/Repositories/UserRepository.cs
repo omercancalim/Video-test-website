@@ -17,8 +17,9 @@ namespace Vtest94.Repositories
         public async Task<User> GetUserByIdAsync(string userId)
         {
             return await _context.Users
-                                 .Include(u => u.Videos)
-                                 .FirstOrDefaultAsync(u => u.Id == userId);
+                         .Include(u => u.Videos)
+                             .ThenInclude(v => v.VideoStats)
+                         .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()

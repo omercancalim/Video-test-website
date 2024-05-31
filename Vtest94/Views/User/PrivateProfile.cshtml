@@ -18,64 +18,45 @@
 }
 
 <div class="h-100">
-    <div class="d-flex justify-content-center">
-        <div class="col">
-            <div class="card custom-card-profile text-white">
-                <div class="rounded-top text-white d-flex flex-row" style="background-color: #000; height:200px;">
-                    <div class="ms-4 mt-5 mb-3 d-flex" style="width:136px">
-                        <img src="@Url.Content($"~/UserPhotos/{Model.Id}/profile.jpg?v=" + DateTime.Now.Ticks)" alt="@Model.ArbitraryUsername" class="img-fluid h-100 w-auto custom-circle-img"
-                             style="width: 150px; z-index: 1">
-                    </div>
-                    <div class="ms-3" style="margin-top:120px;">
-                        <h5 id="profileUsername">@Model.ArbitraryUsername</h5>
-                        <p style="margin:0">Email: @Model.Email</p>
-                    </div>
-                    <div class="d-flex flex-row-reverse ms-auto pe-2 pt-2">
-                        <button id="uploadPhotoBtn" class="btn btn-warning text-dark align-self-start">
-                            <i class="fa-regular fa-pen-to-square"></i>
-                        </button>
-                    </div>
+    <div class="text-white">
+        <div class="profile-header-image">
+            <img src="https://picsum.photos/1000/500" alt="Alternate Text" />
+        </div>
+        <div class="d-flex flex-row">
+            <div>
+                <img src="@Url.Content($"~/UserPhotos/{Model.Id}/profile.jpg?v=" + DateTime.Now.Ticks)" alt="@Model.ArbitraryUsername" class="custom-circle-img">
+            </div>
+            <div class="ms-4">
+                <div class="d-flex flex-row align-items-center">
+                    <h2>@Model.ArbitraryUsername</h2>
+                    <button id="uploadPhotoBtn">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
                 </div>
-                <div class="p-4">
-                    <div class="d-flex justify-content-end text-center py-1">
-                        <div>
-                            <p class="mb-1 h5">@Model.Videos.Count</p>
-                            <p class="small mb-0">Videos</p>
-                        </div>
-                        <div class="px-3">
-                            <p class="mb-1 h5">5</p>
-                            <p class="small mb-0">Followers</p>
-                        </div>
-                        <div>
-                            <p class="mb-1 h5">6</p>
-                            <p class="small mb-0">Following</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-4" style="border-bottom-left-radius:6px; border-bottom-right-radius:6px;">
-                    <div class="mb-5">
-                        <p class="lead fw-normal mb-1">About</p>
-                        <div class="p-4">
-                            <p class="font-italic mb-1">Web Developer</p>
-                            <p class="font-italic mb-1">Lives in New York</p>
-                            <p class="font-italic mb-0">Photographer</p>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <p class="lead fw-normal mb-0">Recent Videos</p>
-                        <p class="mb-0"><a href="#!">Show all</a></p>
-                    </div>
-                    <div class="row g-2">
-                        @foreach (var video in Model.Videos)
-                        {
-                            <div class="col-12 col-md-4 col-lg-3 mb-2">
-                                <a asp-controller="Video" asp-action="SelectedVideo" asp-route-videoId="@video.Id">
-                                    <img src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" alt="@video.Title" class="w-100 rounded-3">
-                                </a>
+                <p><span>230k subscribers</span> ~ <span>@Model.Videos.Count videos</span></p>
+                <p>Email: @Model.Email</p>
+            </div>
+        </div>
+        <div class="card-body p-4" style="border-bottom-left-radius:6px; border-bottom-right-radius:6px;">
+            <div class="mb-4">
+                <p class="lead fw-normal mb-0">Recent Videos</p>
+            </div>
+            <div class="row g-3">
+                @foreach (var video in Model.Videos)
+                {
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <a asp-controller="Video" asp-action="SelectedVideo" asp-route-videoId="@video.Id" title="@video.Title">
+                            <div style="position: relative;">
+                                <img src="@Url.Content($"~/thumbnails/{video.ThumbnailName}")" alt="@video.Title" class="w-100 rounded-3">
+                                <div class="duration-box">@FormatDuration(video.Duration)</div>
                             </div>
-                        }
+                        </a>
+                        <a asp-controller="Video" asp-action="SelectedVideo" asp-route-videoId="@video.Id" title="@video.Title">
+                            <p class="profile-video-description">@video.Title</p>
+                        </a>
+                        <p class="profile-video-info">@FormatViewCount((int)video.VideoStats.ViewCount) view ~ @GetRelativeTime(video.UploadedDate)</p>
                     </div>
-                </div>
+                }
             </div>
         </div>
     </div>
@@ -128,3 +109,82 @@
 
 <!-- Setting success -->
 <div id="popupInfoBox">Settings saved <i class="fa-solid fa-check"></i></div>
+
+@functions {
+    // Helper method to format TimeSpan
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.Days > 0)
+        {
+            // Format string for durations with days
+            return string.Format("{0}:{1:D2}:{2:D2}:{3:D2}", duration.Days, duration.Hours, duration.Minutes, duration.Seconds);
+        }
+        else if (duration.Hours > 0)
+        {
+            // Format string for durations with hours
+            return string.Format("{0}:{1:D2}:{2:D2}", duration.Hours, duration.Minutes, duration.Seconds);
+        }
+        else
+        {
+            // Format string for durations less than an hour
+            return string.Format("{0}:{1:D2}", duration.Minutes, duration.Seconds);
+        }
+    }
+
+    // Helper method to get relative time
+    private static string GetRelativeTime(DateTime dateTime)
+    {
+        var currentTime = DateTime.UtcNow;
+        var timeSpan = currentTime.Subtract(dateTime);
+
+        // Debugging: Print currentTime and dateTime
+        System.Diagnostics.Debug.WriteLine($"Current Time (UTC): {currentTime}");
+        System.Diagnostics.Debug.WriteLine($"Uploaded Date (UTC): {dateTime.ToUniversalTime()}");
+        System.Diagnostics.Debug.WriteLine($"Time Span: {timeSpan}");
+
+        if (timeSpan <= TimeSpan.FromSeconds(60))
+        {
+            return "just now";
+        }
+        else if (timeSpan <= TimeSpan.FromMinutes(60))
+        {
+            return $"{timeSpan.Minutes} minutes ago";
+        }
+        else if (timeSpan <= TimeSpan.FromHours(24))
+        {
+            return $"{timeSpan.Hours} hours ago";
+        }
+        else if (timeSpan <= TimeSpan.FromDays(30))
+        {
+            return $"{timeSpan.Days} days ago";
+        }
+        else if (timeSpan <= TimeSpan.FromDays(365))
+        {
+            return $"{timeSpan.Days / 30} months ago";
+        }
+        else
+        {
+            return $"{timeSpan.Days / 365} years ago";
+        }
+    }
+
+    public string FormatViewCount(int viewCount)
+    {
+        if (viewCount >= 1_000_000_000)
+        {
+            return (viewCount / 1_000_000_000.0).ToString("0.#") + "B";
+        }
+        else if (viewCount >= 1_000_000)
+        {
+            return (viewCount / 1_000_000.0).ToString("0.#") + "M";
+        }
+        else if (viewCount >= 10_000)
+        {
+            return (viewCount / 1_000.0).ToString("0.#") + "K";
+        }
+        else
+        {
+            return viewCount.ToString();
+        }
+    }
+}

@@ -1,4 +1,11 @@
-﻿@model Vtest94.Models.Video
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+
+@{
+    var isAuthenticated = SignInManager.IsSignedIn(User).ToString().ToLower();
+}
+
+@model Vtest94.Models.Video
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Main/Middle/SelectedVideo.css" asp-append-version="true" />
@@ -26,18 +33,24 @@
                     </a>
                     <p>422k subscribers</p>
                 </div>
-                <div class="like-dislike-buttons">
-                    <button type="button" class="btn btn-outline-success me-2">
-                        <i class="fa-solid fa-thumbs-up"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-danger">
-                        <i class="fa-solid fa-thumbs-down"></i>
-                    </button>
+                <div class="like-dislike-buttons d-flex">
+                    <div class="d-flex align-items-baseline">
+                        <button id="like-button" data-video-id="@Model.Id" data-liked="false" type="button" class="btn btn-outline-success me-2">
+                            <i class="fa-solid fa-thumbs-up" aria-hidden="true"></i>
+                        </button>
+                        <p id="like-count">@Model.VideoStats.LikeCount</p>
+                    </div>
+                    <div class="d-flex align-items-baseline">
+                        <button id="dislike-button" data-video-id="@Model.Id" data-disliked="false" type="button" class="btn btn-outline-danger me-2">
+                            <i class="fa-solid fa-thumbs-down" aria-hidden="true"></i>
+                        </button>
+                        <p id="dislike-count">@Model.VideoStats.DislikeCount</p>
+                    </div>
                 </div>
             </div>
             <div class="selected-content">
                 <div class="d-flex" style="gap:10px">
-                    <p>@FormatViewCount((int)Model.ViewCount) view</p>
+                    <p>@FormatViewCount((int)Model.VideoStats.ViewCount) view</p>
                     <p>@GetRelativeTime(@Model.UploadedDate)</p>
                 </div>
                 <p>@Model.Description</p>
@@ -75,6 +88,48 @@
                 });
             }
         });
+
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var videoId = $('#like-button').data('video-id');
+
+        function sendRequest(url, videoId) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                data: {
+                    videoId: videoId
+                },
+                success: function (response) {
+                    $('#like-count').text(response.likeCount);
+                    $('#dislike-count').text(response.dislikeCount);
+                    updateButtonStates();
+                },
+                error: function () {
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        }
+
+        $('#like-button').click(function () {
+            if (!@isAuthenticated) {
+                alert('You must be logged in to like this video.');
+                return;
+            }
+            sendRequest('@Url.Action("ToggleLike", "Video")', videoId);
+        });
+
+        $('#dislike-button').click(function () {
+            if (!@isAuthenticated) {
+                alert('You must be logged in to dislike this video.');
+                return;
+            }
+            sendRequest('@Url.Action("ToggleDislike", "Video")', videoId);
+        });
+
+        updateButtonStates();
     });
 </script>
 

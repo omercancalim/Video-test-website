@@ -1,6 +1,21 @@
-﻿.custom-circle-img {
+﻿p {
+    margin: 0;
+}
+
+h2 {
+    margin: 0;
+}
+
+a:link, a:visited {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.custom-circle-img {
     object-fit: cover;
     border-radius: 180px;
+    max-width: 150px;
 }
 
 .custom-card-profile {
@@ -98,4 +113,59 @@
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
+}
+
+.profile-header-image {
+    border-radius: 30px;
+    margin-bottom: 20px;
+    max-height: 200px;
+}
+
+.profile-header-image img {
+    border-radius: 30px;
+    max-height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.profile-video-description {
+    display: -webkit-box;
+    word-break: break-word;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    margin-bottom: 5px;
+}
+
+.profile-video-info {
+    font-size: 13px;
+    color: #b9b9b9;
+}
+
+.duration-box {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+#uploadPhotoBtn {
+    box-sizing: border-box;
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+    color: white;
+    transition: background-color 0.3s ease;
+    padding: 5px 10px 7px 10px;
+    margin-left: 10px;
+}
+
+#uploadPhotoBtn:hover {
+    background-color: gray;
 }

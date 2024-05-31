@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using Vtest94.Models;
 
 namespace Vtest94.Data
@@ -18,7 +19,8 @@ namespace Vtest94.Data
         public DbSet<Video> Videos { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<UserPhoto> UserPhotos { get; set; }
-        public DbSet<VideoView> VideoViews { get; set; }
+        public DbSet<VideoStats> VideoStats { get; set; }
+        public DbSet<UserLikes> UserLikes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -48,12 +50,18 @@ namespace Vtest94.Data
                 .IsRequired() // Ensures that the foreign key cannot be null
                 .OnDelete(DeleteBehavior.Restrict); // Change delete behavior to Restrict
 
-            // Configure the Video-VideoView relationship
+            // Configure the Video-VideoStats relationship
             builder.Entity<Video>()
-                .HasMany(v => v.VideoViews)
-                .WithOne(vv => vv.Video)
-                .HasForeignKey(vv => vv.VideoId)
-                .OnDelete(DeleteBehavior.Cascade); // Keep delete behavior as Cascade
+                .HasOne(v => v.VideoStats)
+                .WithOne()
+                .HasForeignKey<Video>(v => v.VideoStatsId)
+                .OnDelete(DeleteBehavior.Cascade); // Ensure cascade delete
+
+            builder.Entity<UserLikes>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserId).HasMaxLength(450);
+            });
 
         }
     }

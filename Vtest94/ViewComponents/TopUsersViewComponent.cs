@@ -21,7 +21,11 @@ public class TopUsersViewComponent : ViewComponent
             {
                 User = u,
                 VideoCount = u.Videos.Count,
-                TotalViews = u.Videos.Sum(v => v.ViewCount)
+                TotalViews = u.Videos.Join(_context.VideoStats,
+                                    v => v.Id,
+                                    vs => vs.VideoId,
+                                    (v, vs) => vs.ViewCount)
+                              .Sum()
             })
             .OrderByDescending(u => u.VideoCount)
             .Take(7)

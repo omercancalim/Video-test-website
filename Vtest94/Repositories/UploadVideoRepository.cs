@@ -37,8 +37,26 @@ namespace Vtest94.Repositories
                 video.ThumbnailName = thumbnailFileName;
 
                 video.CategoryId = categoryId;
+
+                // Create and add VideoStats entity
+                var videoStats = new VideoStats
+                {
+                    ViewCount = 0,
+                    LikeCount = 0,
+                    DislikeCount = 0
+                };
+
+                _context.VideoStats.Add(videoStats);
+                await _context.SaveChangesAsync();
+                // Assign the newly created VideoStatsId to the video
+                video.VideoStatsId = videoStats.Id;
+
                 // Assuming other properties like Title and Description are already set on the Video object
                 _context.Videos.Add(video);
+                await _context.SaveChangesAsync();
+
+                videoStats.VideoId = video.Id;
+                _context.VideoStats.Update(videoStats);
                 await _context.SaveChangesAsync();
             }
 
@@ -97,6 +115,7 @@ namespace Vtest94.Repositories
         {
             return await _context.Videos
                                   .Include(v => v.User)
+                                  .Include(v => v.VideoStats)
                                   .FirstOrDefaultAsync(v => v.Id == id);
         }
 
