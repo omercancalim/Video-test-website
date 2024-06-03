@@ -35,8 +35,15 @@ namespace Vtest94.Controllers
             return View(user);
         }
 
+        [Authorize]
         public async Task<IActionResult> PrivateProfile(string userId)
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != currentUserId)
+            {
+                return RedirectToAction("PublicProfile", "User", new { userId = userId });
+            }
+
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
             {
@@ -132,13 +139,11 @@ namespace Vtest94.Controllers
 
             try
             {
-                // Save changes to the database
                 await _userRepository.UpdateUserAsync(user);
                 return Ok(new { success = true, message = "Username updated successfully." });
             }
             catch (Exception ex)
             {
-                // Handle exceptions (e.g., logging)
                 return StatusCode(500, new { success = false, message = "An error occurred while updating the username.", error = ex.Message });
             }
         }
