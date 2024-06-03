@@ -1,9 +1,5 @@
 ﻿@model IEnumerable<dynamic>
 
-@{
-    int imgCounter = 0;  // Initialize the counter variable
-}
-
 <div class="custom-widget-inner">
     <h5 class="custom-widget-title">Top Users</h5>
     <div class="d-flex flex-column">
@@ -18,10 +14,32 @@
                 <div class="custom-channel-info">
                     <a asp-controller="User" asp-action="PublicProfile" asp-route-userId="@user.User.Id" class="channel-info-name text-truncate">@user.User.ArbitraryUsername</a>
                     <p class="channel-info-videos">Videos: @user.VideoCount</p>
-                    <p class="channel-info-views">@user.TotalViews views</p>
+                    <p class="channel-info-views">@FormatViewCount(user.TotalViews) views</p>
                 </div>
             </div>
-            imgCounter++;
         }
     </div>
 </div>
+
+
+@functions {
+    public string FormatViewCount(int viewCount)
+    {
+        if (viewCount >= 1_000_000_000)
+        {
+            return (viewCount / 1_000_000_000.0).ToString("0.#") + "B";
+        }
+        else if (viewCount >= 1_000_000)
+        {
+            return (viewCount / 1_000_000.0).ToString("0.#") + "M";
+        }
+        else if (viewCount >= 10_000)
+        {
+            return (viewCount / 1_000.0).ToString("0.#") + "K";
+        }
+        else
+        {
+            return viewCount.ToString();
+        }
+    }
+}

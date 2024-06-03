@@ -5,7 +5,6 @@
     if (urlParams.get('popup') === 'true') {
         showPopup();
 
-        // Remove the 'popup' parameter from the URL to avoid showing the popup on subsequent reloads
         var url = new URL(window.location.href);
         url.searchParams.delete('popup');
         window.history.replaceState({}, document.title, url.toString());
@@ -64,7 +63,6 @@
     document.getElementById('savePhotoBtn').addEventListener('click', async function () {
         var newUsername = document.getElementById('usernameInput').value;
         var usernameError = document.getElementById('usernameError');
-        var usernameText = document.getElementById('profileUsername');
 
         // Client-side validation
         if (!newUsername) {
