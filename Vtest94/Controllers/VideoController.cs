@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Nest;
 using System.Security.Claims;
 using Vtest94.Data;
 using Vtest94.Interfaces;
 using Vtest94.Models;
+using Vtest94.Services;
 using Vtest94.ViewModels;
 
 namespace Vtest94.Controllers
@@ -17,11 +19,16 @@ namespace Vtest94.Controllers
         private readonly IUploadVideoRepository _videoRepository;
         private readonly UserManager<User> _userManager;
         private readonly AppDbContext _appDbContext;
-        public VideoController(IUploadVideoRepository videoRepository, UserManager<User> userManager, AppDbContext appDbContext)
+        private readonly VideoSearchService _videoSearchService;
+        public VideoController(IUploadVideoRepository videoRepository, 
+            UserManager<User> userManager, 
+            AppDbContext appDbContext,
+            VideoSearchService videoSearchService)
         {
             _videoRepository = videoRepository;
             _userManager = userManager;
             _appDbContext = appDbContext;
+            _videoSearchService = videoSearchService;
         }
 
         [HttpGet] // Actually [HttpGet] is set by default we dont have to wirte it explicitly
@@ -38,7 +45,9 @@ namespace Vtest94.Controllers
         public async Task<IActionResult> SearchVideo(string searchString)
         {
             ViewData["CurrentFilter"] = searchString;
-            var videos = await _videoRepository.GetAllVideosAsync(searchString);
+
+            var videos = await _videoSearchService.SearchVideosAsync(searchString);
+
             return View(videos);
         }
 
@@ -172,73 +181,103 @@ namespace Vtest94.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult ToggleLike(int videoId)
+        public async Task<IActionResult> ToggleLike(int videoId)
         {
-            var userId = GetUserId();
-            var existingAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && ua.IsLike);
-
-            var existingDislikeAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && !ua.IsLike);
-
-            if (existingAction != null)
+            using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
             {
-                _appDbContext.UserLikes.Remove(existingAction);
-            }
-            else
-            {
-                if (existingDislikeAction != null)
+                var videoStats = _appDbContext.VideoStats.SingleOrDefault(v => v.VideoId == videoId);
+
+                try
                 {
-                    _appDbContext.UserLikes.Remove(existingDislikeAction);
+                    var userId = GetUserId();
+                    var existingAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && ua.IsLike);
+
+                    var existingDislikeAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && !ua.IsLike);
+
+                    if (existingAction != null)
+                    {
+                        _appDbContext.UserLikes.Remove(existingAction);
+                    }
+                    else
+                    {
+                        if (existingDislikeAction != null)
+                        {
+                            _appDbContext.UserLikes.Remove(existingDislikeAction);
+                        }
+                        _appDbContext.UserLikes.Add(new UserLikes { UserId = userId, VideoId = videoId, IsLike = true });
+                    }
+
+                    _appDbContext.SaveChanges();
+
+                    if (videoStats != null)
+                    {
+                        videoStats.LikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && ul.IsLike);
+                        videoStats.DislikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && !ul.IsLike);
+                        _appDbContext.SaveChanges();
+                    }
+
+                    await transaction.CommitAsync();
                 }
-                _appDbContext.UserLikes.Add(new UserLikes { UserId = userId, VideoId = videoId, IsLike = true });
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    //return Json(new { likeCount = videoStats.LikeCount, dislikeCount = videoStats.DislikeCount });
+                    return StatusCode(500, new { message = "Internal server error", likeCount = videoStats?.LikeCount ?? 0, dislikeCount = videoStats?.DislikeCount ?? 0 });
+                }
+
+                return Json(new { likeCount = videoStats?.LikeCount ?? 0, dislikeCount = videoStats?.DislikeCount ?? 0 });
             }
-
-            _appDbContext.SaveChanges();
-
-            var videoStats = _appDbContext.VideoStats.SingleOrDefault(v => v.VideoId == videoId);
-            if (videoStats != null)
-            {
-                videoStats.LikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && ul.IsLike);
-                videoStats.DislikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && !ul.IsLike);
-                _appDbContext.SaveChanges();
-            }
-
-            return Json(new { likeCount = videoStats.LikeCount, dislikeCount = videoStats.DislikeCount });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult ToggleDislike(int videoId)
+        public async Task<IActionResult> ToggleDislike(int videoId)
         {
-            var userId = GetUserId();
-            var existingAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && !ua.IsLike);
-
-            var existingLikeAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && ua.IsLike);
-
-            if (existingAction != null)
+            using (var transaction = await _appDbContext.Database.BeginTransactionAsync())
             {
-                _appDbContext.UserLikes.Remove(existingAction);
-            }
-            else
-            {
-                if (existingLikeAction != null)
+                var videoStats = _appDbContext.VideoStats.SingleOrDefault(v => v.VideoId == videoId);
+
+                try
                 {
-                    _appDbContext.UserLikes.Remove(existingLikeAction);
+                    var userId = GetUserId();
+                    var existingAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && !ua.IsLike);
+
+                    var existingLikeAction = _appDbContext.UserLikes.SingleOrDefault(ua => ua.VideoId == videoId && ua.UserId == userId && ua.IsLike);
+
+                    if (existingAction != null)
+                    {
+                        _appDbContext.UserLikes.Remove(existingAction);
+                    }
+                    else
+                    {
+                        if (existingLikeAction != null)
+                        {
+                            _appDbContext.UserLikes.Remove(existingLikeAction);
+                        }
+                        _appDbContext.UserLikes.Add(new UserLikes { UserId = userId, VideoId = videoId, IsLike = false });
+                    }
+
+                    _appDbContext.SaveChanges();
+
+                    if (videoStats != null)
+                    {
+                        videoStats.LikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && ul.IsLike);
+                        videoStats.DislikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && !ul.IsLike);
+                        _appDbContext.SaveChanges();
+                    }
+
+                    transaction.Commit();
                 }
-                _appDbContext.UserLikes.Add(new UserLikes { UserId = userId, VideoId = videoId, IsLike = false });
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    //return Json(new { likeCount = videoStats.LikeCount, dislikeCount = videoStats.DislikeCount });
+                    return StatusCode(500, new { message = "Internal server error", likeCount = videoStats?.LikeCount ?? 0, dislikeCount = videoStats?.DislikeCount ?? 0 });
+                }
+
+                return Json(new { likeCount = videoStats?.LikeCount ?? 0, dislikeCount = videoStats?.DislikeCount ?? 0 });
             }
-
-            _appDbContext.SaveChanges();
-
-            var videoStats = _appDbContext.VideoStats.SingleOrDefault(v => v.VideoId == videoId);
-            if (videoStats != null)
-            {
-                videoStats.LikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && ul.IsLike);
-                videoStats.DislikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && !ul.IsLike);
-                _appDbContext.SaveChanges();
-            }
-
-            return Json(new { likeCount = videoStats.LikeCount, dislikeCount = videoStats.DislikeCount });
         }
     }
 }

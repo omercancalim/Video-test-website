@@ -460,7 +460,7 @@ namespace Vtest94.Migrations
                     b.HasOne("Vtest94.Models.User", "User")
                         .WithMany("Videos")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Vtest94.Models.VideoStats", "VideoStats")

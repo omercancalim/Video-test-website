@@ -8,6 +8,9 @@ using Vtest94.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Nest;
+using Elasticsearch.Net;
+using Vtest94.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +20,27 @@ FFmpeg.SetExecutablesPath(@"C:\ffmpeg\bin");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Load Elasticsearch configuration
+var elasticsearchSettings = builder.Configuration.GetSection("Elasticsearch");
+var settings = new ConnectionSettings(new Uri(elasticsearchSettings["Url"]))
+               .DefaultIndex(elasticsearchSettings["DefaultIndex"])
+               .ServerCertificateValidationCallback(CertificateValidations.AllowAll) // Disable SSL verification
+               .BasicAuthentication(elasticsearchSettings["Username"], elasticsearchSettings["Password"]); // Correctly reference username and password
+
+
+var client = new ElasticClient(settings);
+builder.Services.AddSingleton<IElasticClient>(client);
+
+// Add application services
+builder.Services.AddScoped<ElasticsearchSyncService>();
+builder.Services.AddSingleton<VideoSearchService>();
+
 // Configure Entity Framework and Identity
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Assuming you are using ASP.NET Core Identity
-//builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+// builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
 //                .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -37,7 +55,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
-    options.LoginPath = "/Account/Login"; // Your login path
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied"; 
 })
 .AddGoogle(options =>
 {
@@ -76,5 +95,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Video}/{action=Index}/{id?}");
+
+// Elasticsearch
+using (var scope = app.Services.CreateScope())
+{
+    var syncService = scope.ServiceProvider.GetRequiredService<ElasticsearchSyncService>();
+    await syncService.SyncVideosAsync(); // Sync data on application startup
+}
+
 
 app.Run();
