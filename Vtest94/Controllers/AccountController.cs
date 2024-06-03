@@ -160,7 +160,7 @@ namespace Vtest94.Controllers
 
         public IActionResult AccessDenied()
         {
-            return RedirectToAction("Login", new { ReturnUrl = "/Video/Index" });
+            return RedirectToAction("Login", "Account");
         }
 
         // GET: /Account/Register
