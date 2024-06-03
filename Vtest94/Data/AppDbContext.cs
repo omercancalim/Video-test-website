@@ -32,7 +32,7 @@ namespace Vtest94.Data
                 .WithOne(v => v.User)
                 .HasForeignKey(v => v.UserId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict); // Change delete behavior to Restrict
+                .OnDelete(DeleteBehavior.Cascade); // Change delete behavior to Restrict
 
             // Configure the User-UserPhoto relationship
             builder.Entity<User>()
