@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# My own gitignores
+/Vtest94/wwwroot/thumbnails
+/Vtest94/wwwroot/auxiliary
+/Vtest94/wwwroot/UserPhotos
+/Vtest94/wwwroot/videos
