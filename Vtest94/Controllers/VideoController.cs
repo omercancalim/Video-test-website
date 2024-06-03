@@ -209,6 +209,9 @@ namespace Vtest94.Controllers
 
                     _appDbContext.SaveChanges();
 
+                    //throw new Exception("Simulated error to test transaction rollback.");
+                    //await transaction.RollbackAsync();
+
                     if (videoStats != null)
                     {
                         videoStats.LikeCount = _appDbContext.UserLikes.Count(ul => ul.VideoId == videoId && ul.IsLike);
@@ -259,6 +262,8 @@ namespace Vtest94.Controllers
                     }
 
                     _appDbContext.SaveChanges();
+
+                    //throw new Exception("Simulated error to test transaction rollback.");
 
                     if (videoStats != null)
                     {
