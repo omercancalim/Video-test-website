@@ -14,6 +14,7 @@ Before you begin, ensure you have met the following requirements:
 - **.NET 6.0 SDK:** Download and install from [Microsoft .NET Download](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 - **SQL Server:** Download and install from [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
 - **FFmpeg:** This is required for video processing (thumbnail extraction). Download and install from [FFmpeg.org](https://ffmpeg.org/download.html).
+- **Elasticsearch:** Download and install from [Elastic Search](https://www.elastic.co/elasticsearch).
 
 ## Dependencies
 
