@@ -7,6 +7,8 @@ This ASP.NET Core MVC application allows users to register, log in, upload video
 - **User Authentication:** Register and log in functionality.
 - **Video Upload:** Users can upload videos which are processed to extract thumbnails.
 - **Video Gallery:** Users can view all uploaded videos with details and thumbnails.
+- **Search Functionality:** Users can search for videos using Elasticsearch for fast and accurate results.
+- **Video Likes:** Users can like the videos.
 
 ## Prerequisites
 
@@ -14,6 +16,7 @@ Before you begin, ensure you have met the following requirements:
 - **.NET 6.0 SDK:** Download and install from [Microsoft .NET Download](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 - **SQL Server:** Download and install from [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
 - **FFmpeg:** This is required for video processing (thumbnail extraction). Download and install from [FFmpeg.org](https://ffmpeg.org/download.html).
+- **Elasticsearch:** Download and install from [Elasticsearch](https://www.elastic.co/elasticsearch).
 
 ## Dependencies
 
@@ -24,6 +27,10 @@ This project uses the following packages:
 - `Microsoft.EntityFrameworkCore`
 - `Microsoft.AspNetCore.Identity.UI`
 - `Microsoft.AspNetCore.Identity.EntityFrameworkCore`
+- `Microsoft.EntityFrameworkCore.Proxies`
+- `Microsoft.AspNetCore.Authentication.Google`
+- `NEST`
+- `Elasticsearch.Net`
 
 ## Setup Instructions
 
@@ -32,7 +39,7 @@ This project uses the following packages:
 1. **Create Database:**
    - Open SQL Server Management Studio (SSMS).
    - Connect to your SQL Server instance.
-   - Create a new database named `test97`.
+   - Create a new database.
 
 2. **Update Connection String:**
    - Navigate to `appsettings.json` in your project.
@@ -40,7 +47,7 @@ This project uses the following packages:
 
     ```json
     "ConnectionStrings": {
-        "DefaultConnection": "Server=localhost;Database=test97;Trusted_Connection=True;MultipleActiveResultSets=true"
+        "DefaultConnection": "Server=<hostname>;Database=<dbname>;Trusted_Connection=True;MultipleActiveResultSets=true"
     }
     ```
 
