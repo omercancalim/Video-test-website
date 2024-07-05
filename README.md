@@ -2,6 +2,17 @@
 
 This ASP.NET Core MVC application allows users to register, log in, upload videos, and view their own and other users' videos. It includes functionality for video processing such as thumbnail extraction using FFmpeg.
 
+<p>
+    <img src="Vtest94\wwwroot\ghubPreview\preview1.jpg" width="400" hspace="5" >
+    <img src="Vtest94\wwwroot\ghubPreview\preview2.jpg" width="400" >
+    <p>
+    <img src="Vtest94\wwwroot\ghubPreview\preview3.jpg" width="400" hspace="5" >
+    <img src="Vtest94\wwwroot\ghubPreview\preview4.jpg" width="400" >
+    <p>
+    <img src="Vtest94\wwwroot\ghubPreview\preview5.jpg" width="400" hspace="5" >
+    <img src="Vtest94\wwwroot\ghubPreview\preview6.jpg" width="400" >
+</p>
+
 ## Features
 
 - **User Authentication:** Register and log in functionality.
